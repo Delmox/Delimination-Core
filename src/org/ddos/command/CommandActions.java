@@ -29,11 +29,11 @@ public class CommandActions {
 										command.hasFlag("-l") ? Integer.parseInt(command.getFlag("-l").getValue()) : 32,
 										command.hasFlag("-t") ? Integer.parseInt(command.getFlag("-t").getValue()) : 1)
 												.setMessage("START_DDOS"));
-						System.out.println("Started DDoS attack on " + command.getCommandArguments()[1]);
+						System.out.println("Started DDoS attack on " + command.getCommandArguments()[1] + ".");
 					} else {
 						ClientNetwork.getClient().getOutputStream()
 								.writeObject(new DataPackage(command.getCommandArguments()[1]).setMessage("STOP_DDOS"));
-						System.out.println("Stopped DDoS attack on " + command.getCommandArguments()[1]);
+						System.out.println("Stopped DDoS attack on " + command.getCommandArguments()[1] + ".");
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -192,10 +192,10 @@ public class CommandActions {
 							command.hasFlag("-l") ? Integer.parseInt(command.getFlag("-l").getValue()) : 32,
 							command.hasFlag("-t") ? Integer.parseInt(command.getFlag("-t").getValue()) : 1);
 					DOS.start();
-					Console.println("Started DoS attack on " + command.getCommandArguments()[1]);
+					Console.println("Started DoS attack on " + command.getCommandArguments()[1] + ".");
 				} else {
 					DOS.stop();
-					Console.println("Stopped DoS attack on " + command.getCommandArguments()[1]);
+					Console.println("Stopped DoS attack on " + command.getCommandArguments()[1] + ".");
 				}
 
 				return null;
