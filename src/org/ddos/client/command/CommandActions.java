@@ -1,4 +1,4 @@
-package org.ddos.command;
+package org.ddos.client.command;
 
 import java.io.IOException;
 import java.io.Serializable;

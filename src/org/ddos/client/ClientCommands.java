@@ -1,6 +1,6 @@
 package org.ddos.client;
 
-import org.ddos.command.CommandActions;
+import org.ddos.client.command.CommandActions;
 import org.jcom.Command;
 import org.jcom.CommandData;
 import org.jcom.CommandInterface;

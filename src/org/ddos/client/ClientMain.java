@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import org.ddos.network.ClientNetwork;
+import org.ddos.util.ServerConstants;
 import org.jcom.Command;
 import org.jcom.CommandData;
 import org.jcom.CommandInterface;
@@ -14,7 +15,7 @@ import org.jnetwork.Connection;
 public class ClientMain {
 	public static void main(String[] args) {
 		try {
-			ClientNetwork.setClient(new Connection("server2.jacobsrandomsite.com", 25565));
+			ClientNetwork.setClient(new Connection(ServerConstants.ADDRESS, ServerConstants.PORT));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

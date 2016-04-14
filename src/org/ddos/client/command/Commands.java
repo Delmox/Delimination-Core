@@ -1,4 +1,4 @@
-package org.ddos.command;
+package org.ddos.client.command;
 
 import org.ddos.util.Strings;
 import org.jcom.CommandData;
