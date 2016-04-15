@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jcommands.jar"/>
 	<classpathentry kind="lib" path="lib/jnetwork_core-v1.7.jar"/>
+	<classpathentry kind="lib" path="lib/jnativehook-2.0.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

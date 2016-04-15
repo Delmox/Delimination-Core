@@ -168,7 +168,7 @@ public class CommandActions {
 							.writeObject(new DataPackage().setMessage("KICK_ALL_ZOMBIES"));
 					try {
 						Thread.sleep(1000); // prevent shutdown before object is
-											// read
+											// read if exit command has -k flag
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -196,6 +196,39 @@ public class CommandActions {
 				} else {
 					DOS.stop();
 					Console.println("Stopped DoS attack on " + command.getCommandArguments()[1] + ".");
+				}
+
+				return null;
+			}
+		};
+	}
+
+	public static CommandJob getWaitAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				Object monitor = new Object();
+				synchronized (monitor) {
+					try {
+						monitor.wait();
+					} catch (InterruptedException e) {
+						// good! the user interrupted the thread
+					}
+				}
+
+				return null;
+			}
+		};
+	}
+
+	public static CommandJob getWaitForMillisecondsAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				try {
+					Thread.sleep(Long.parseLong(command.getCommandArguments()[0]));
+				} catch (InterruptedException e) {
+					// interrupted by user
 				}
 
 				return null;

@@ -4,6 +4,7 @@ import org.ddos.client.command.CommandActions;
 import org.jcom.Command;
 import org.jcom.CommandData;
 import org.jcom.CommandInterface;
+import org.jcom.CommandInterruptedException;
 import org.jcom.FlagData;
 import org.jcom.InvalidCommandArgumentsException;
 import org.jcom.UnknownCommandException;
@@ -40,11 +41,16 @@ public class ClientCommands {
 						CommandActions.getUniversalHelpAction()),
 				new CommandData("help <command>", "Gets help for the specified command.", 1,
 						CommandActions.getHelpForCommandAction()));
+		commands.putCommand("wait",
+				new CommandData("wait", "Waits until the user stops the command.", 0, CommandActions.getWaitAction()),
+				new CommandData("wait <time>", "Waits for a given amount of milliseconds.", 1,
+						CommandActions.getWaitForMillisecondsAction()));
 		commands.putCommand("exit", new CommandData("exit", "Exits the SimpleDDoS client.", 0,
 				CommandActions.getExitAction(), new FlagData("-k", "Kicks all of the zombies off of the server.")));
 	}
 
-	public void executeCommand(Command command) throws UnknownCommandException, InvalidCommandArgumentsException {
+	public void executeCommand(Command command)
+			throws UnknownCommandException, InvalidCommandArgumentsException, CommandInterruptedException {
 		commands.executeCommand(command);
 	}
 

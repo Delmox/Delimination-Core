@@ -8,6 +8,7 @@ import org.ddos.util.ServerConstants;
 import org.jcom.Command;
 import org.jcom.CommandData;
 import org.jcom.CommandInterface;
+import org.jcom.CommandInterruptedException;
 import org.jcom.InvalidCommandArgumentsException;
 import org.jcom.UnknownCommandException;
 import org.jnetwork.Connection;
@@ -41,6 +42,8 @@ public class ClientMain {
 					System.out.println("Unknown command: " + lastCommand.getBaseCommand());
 					System.out.println(
 							"Type \"help\" for a list of commands or \"help <command>\" for help with a specific command.");
+				} catch (CommandInterruptedException e) {
+					// who cares?
 				}
 			}
 		}
