@@ -38,6 +38,7 @@ public class ClientMain {
 					} catch (UnknownCommandException e1) {
 						// never happens
 					}
+					System.out.println("Type \"help " + lastCommand.getBaseCommand() + "\" for help with the command.");
 				} catch (UnknownCommandException e) {
 					System.out.println("Unknown command: " + lastCommand.getBaseCommand());
 					System.out.println(
