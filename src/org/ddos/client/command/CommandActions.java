@@ -21,6 +21,10 @@ public class CommandActions {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command command) {
+				if (!validateAddress(command.getCommandArguments()[1])) {
+					return null;
+				}
+
 				try {
 					boolean start = command.getCommandArguments()[0].equals("start");
 					if (start) {
@@ -185,6 +189,10 @@ public class CommandActions {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command command) {
+				if (!validateAddress(command.getCommandArguments()[1])) {
+					return null;
+				}
+
 				boolean start = command.getCommandArguments()[0].equals("start");
 
 				if (start) {
@@ -234,5 +242,26 @@ public class CommandActions {
 				return null;
 			}
 		};
+	}
+
+	// TODO
+	private static boolean validateAddress(String string) {
+		System.out.print("Validating address... ");
+		try {
+			Process p1 = java.lang.Runtime.getRuntime().exec("ping -n 1 " + string);
+			int returnVal = p1.waitFor();
+			boolean reachable = (returnVal == 0);
+
+			if (reachable) {
+				System.out.print("VALID\n");
+			} else {
+				System.out.println("INVALID");
+			}
+
+			return reachable;
+		} catch (IOException | InterruptedException e1) {
+			System.out.print("ERROR");
+		}
+		return false;
 	}
 }
