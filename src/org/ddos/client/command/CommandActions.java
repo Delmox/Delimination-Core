@@ -21,8 +21,17 @@ public class CommandActions {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command command) {
-				if (!validateAddress(command.getCommandArguments()[1])) {
-					return null;
+				try {
+					if (!(boolean) command.getInterface().executeCommand("valid " + command.getCommandArguments()[1])) { // TODO
+																															// program
+																															// gets
+																															// hung
+																															// up
+																															// here
+						return null;
+					}
+				} catch (CommandException e) {
+					e.printStackTrace();
 				}
 
 				try {
@@ -189,8 +198,12 @@ public class CommandActions {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command command) {
-				if (!validateAddress(command.getCommandArguments()[1])) {
-					return null;
+				try {
+					if (!(boolean) command.getInterface().executeCommand("valid " + command.getCommandArguments()[1])) {
+						return null;
+					}
+				} catch (CommandException e) {
+					e.printStackTrace();
 				}
 
 				boolean start = command.getCommandArguments()[0].equals("start");
@@ -244,24 +257,26 @@ public class CommandActions {
 		};
 	}
 
-	// TODO
-	private static boolean validateAddress(String string) {
-		System.out.print("Validating address... ");
-		try {
-			Process p1 = java.lang.Runtime.getRuntime().exec("ping -n 1 " + string);
-			int returnVal = p1.waitFor();
-			boolean reachable = (returnVal == 0);
+	public static CommandJob getValidAddressAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				System.out.print("Validating address... ");
+				try {
+					boolean valid;
+					if (valid = (Runtime.getRuntime().exec("ping -n 1 " + command.getCommandArguments()[0])
+							.waitFor() == 0)) {
+						System.out.print("VALID\n");
+					} else {
+						System.out.println("INVALID");
+					}
 
-			if (reachable) {
-				System.out.print("VALID\n");
-			} else {
-				System.out.println("INVALID");
+					return valid;
+				} catch (IOException | InterruptedException e1) {
+					System.out.print("ERROR");
+				}
+				return false;
 			}
-
-			return reachable;
-		} catch (IOException | InterruptedException e1) {
-			System.out.print("ERROR");
-		}
-		return false;
+		};
 	}
 }

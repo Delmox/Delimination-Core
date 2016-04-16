@@ -45,6 +45,8 @@ public class ClientCommands {
 				new CommandData("wait", "Waits until the user stops the command.", 0, CommandActions.getWaitAction()),
 				new CommandData("wait <time>", "Waits for a given amount of milliseconds.", 1,
 						CommandActions.getWaitForMillisecondsAction()));
+		commands.putCommand("valid", new CommandData("valid <address>", "Gets if the given IP address exists.", 1,
+				CommandActions.getValidAddressAction()));
 		commands.putCommand("exit", new CommandData("exit", "Exits the SimpleDDoS client.", 0,
 				CommandActions.getExitAction(), new FlagData("-k", "Kicks all of the zombies off of the server.")));
 	}
