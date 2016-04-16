@@ -25,12 +25,15 @@ public class CommandActions {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command command) {
-				try {
-					if (!(boolean) command.getInterface().executeCommand("valid " + command.getCommandArguments()[1])) {
-						return null;
+				if (command.hasFlag("-v")) {
+					try {
+						if (!(boolean) command.getInterface()
+								.executeCommand("valid " + command.getCommandArguments()[1])) {
+							return null;
+						}
+					} catch (CommandException e) {
+						e.printStackTrace();
 					}
-				} catch (CommandException e) {
-					e.printStackTrace();
 				}
 
 				try {
@@ -197,12 +200,15 @@ public class CommandActions {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command command) {
-				try {
-					if (!(boolean) command.getInterface().executeCommand("valid " + command.getCommandArguments()[1])) {
-						return null;
+				if (command.hasFlag("-v")) {
+					try {
+						if (!(boolean) command.getInterface()
+								.executeCommand("valid " + command.getCommandArguments()[1])) {
+							return null;
+						}
+					} catch (CommandException e) {
+						e.printStackTrace();
 					}
-				} catch (CommandException e) {
-					e.printStackTrace();
 				}
 
 				boolean start = command.getCommandArguments()[0].equals("start");
