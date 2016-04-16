@@ -292,8 +292,7 @@ public class CommandActions {
 			@Override
 			public Object doJob(Command command) {
 				try {
-					ProcessBuilder builder = new ProcessBuilder("C:\\Windows\\System32\\ping.exe",
-							command.getCommandArguments()[0]);
+					ProcessBuilder builder = new ProcessBuilder("ping", command.getCommandArguments()[0]);
 					builder.redirectErrorStream(true);
 					Process process = builder.start();
 					InputStream is = process.getInputStream();

