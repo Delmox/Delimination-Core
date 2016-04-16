@@ -1,6 +1,9 @@
 package org.ddos.client.command;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -12,6 +15,7 @@ import org.ddos.network.ClientNetwork;
 import org.ddos.util.Console;
 import org.jcom.Command;
 import org.jcom.CommandException;
+import org.jcom.CommandInterruptedException;
 import org.jcom.CommandJob;
 import org.jcom.UnknownCommandException;
 import org.jnetwork.DataPackage;
@@ -22,12 +26,7 @@ public class CommandActions {
 			@Override
 			public Object doJob(Command command) {
 				try {
-					if (!(boolean) command.getInterface().executeCommand("valid " + command.getCommandArguments()[1])) { // TODO
-																															// program
-																															// gets
-																															// hung
-																															// up
-																															// here
+					if (!(boolean) command.getInterface().executeCommand("valid " + command.getCommandArguments()[1])) {
 						return null;
 					}
 				} catch (CommandException e) {
@@ -263,17 +262,45 @@ public class CommandActions {
 			public Object doJob(Command command) {
 				System.out.print("Validating address... ");
 				try {
-					boolean valid;
-					if (valid = (Runtime.getRuntime().exec("ping -n 1 " + command.getCommandArguments()[0])
-							.waitFor() == 0)) {
-						System.out.print("VALID\n");
+					boolean valid = (boolean) command.getInterface()
+							.executeCommand("ping " + command.getCommandArguments()[0]);
+					if (valid) {
+						System.out.print("Address Status: VALID\n");
 					} else {
-						System.out.println("INVALID");
+						System.out.println("Address Status: INVALID");
 					}
 
 					return valid;
-				} catch (IOException | InterruptedException e1) {
-					System.out.print("ERROR");
+				} catch (CommandInterruptedException e) {
+					return false;
+				} catch (CommandException e) {
+					System.out.print("Address Status: ERROR: " + e.getMessage());
+				}
+				return false;
+			}
+		};
+	}
+
+	public static CommandJob getPingAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				try {
+					ProcessBuilder builder = new ProcessBuilder("C:\\Windows\\System32\\ping.exe",
+							command.getCommandArguments()[0]);
+					builder.redirectErrorStream(true);
+					Process process = builder.start();
+					InputStream is = process.getInputStream();
+					BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+					String line = null;
+					while ((line = reader.readLine()) != null) {
+						System.out.println(line);
+					}
+
+					return process.waitFor() == 0;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				return false;
 			}

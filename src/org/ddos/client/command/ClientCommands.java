@@ -1,6 +1,5 @@
-package org.ddos.client;
+package org.ddos.client.command;
 
-import org.ddos.client.command.CommandActions;
 import org.jcom.Command;
 import org.jcom.CommandData;
 import org.jcom.CommandInterface;
@@ -41,13 +40,15 @@ public class ClientCommands {
 						CommandActions.getUniversalHelpAction()),
 				new CommandData("help <command>", "Gets help for the specified command.", 1,
 						CommandActions.getHelpForCommandAction()));
+		commands.putCommand("ping", new CommandData("ping <address>", "Pings the given address four times.", 1,
+				CommandActions.getPingAction()));
 		commands.putCommand("wait",
 				new CommandData("wait", "Waits until the user stops the command.", 0, CommandActions.getWaitAction()),
 				new CommandData("wait <time>", "Waits for a given amount of milliseconds.", 1,
 						CommandActions.getWaitForMillisecondsAction()));
 		commands.putCommand("valid", new CommandData("valid <address>", "Gets if the given IP address exists.", 1,
 				CommandActions.getValidAddressAction()));
-		commands.putCommand("exit", new CommandData("exit", "Exits the SimpleDDoS client.", 0,
+		commands.putCommand("exit", new CommandData("exit", "Exits the Delimination client.", 0,
 				CommandActions.getExitAction(), new FlagData("-k", "Kicks all of the zombies off of the server.")));
 	}
 

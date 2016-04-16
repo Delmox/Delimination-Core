@@ -3,6 +3,7 @@ package org.ddos.client;
 import java.io.IOException;
 import java.util.Scanner;
 
+import org.ddos.client.command.ClientCommands;
 import org.ddos.network.ClientNetwork;
 import org.ddos.util.ServerConstants;
 import org.jcom.Command;
