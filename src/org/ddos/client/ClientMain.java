@@ -12,6 +12,7 @@ import org.jcom.CommandInterface;
 import org.jcom.CommandInterruptedException;
 import org.jcom.InvalidCommandArgumentsException;
 import org.jcom.UnknownCommandException;
+import org.jcom.UnknownFlagException;
 import org.jnetwork.Connection;
 
 public class ClientMain {
@@ -30,7 +31,7 @@ public class ClientMain {
 				System.out.print("Delimination>");
 				try {
 					commands.executeCommand(lastCommand = CommandInterface.parseCommand(in.nextLine()));
-				} catch (InvalidCommandArgumentsException e) {
+				} catch (InvalidCommandArgumentsException | UnknownFlagException e) {
 					System.out.println("Usage(s): ");
 					try {
 						for (CommandData data : commands.getCommandData(lastCommand.getBaseCommand())) {
