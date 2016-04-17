@@ -28,13 +28,13 @@ public class ClientCommands {
 		});
 
 		commands.putCommand("ddos",
-				new CommandData("ddos [start|stop] <address> {-l size, -t threads}",
+				new CommandData("ddos [start|stop] <address> {-l size, -t threads, -v valid}",
 						"Starts or stops an attack on address.", 2, CommandActions.getDdosAction(),
 						new FlagData("-l", "An integer which represents the byte size of each ICMP packet."),
 						new FlagData("-t", "An integer which represents the amount of threads which will be pinging."),
 						new FlagData("-v", "Checks if the address is valid before the DDoS starts.")));
 		commands.putCommand("dos",
-				new CommandData("dos [start|stop] <address> {-l size, -t threads}",
+				new CommandData("dos [start|stop] <address> {-l size, -t threads, -v valid}",
 						"Starts or stops an attack on address, where all pinging threads are ran on the local machine.",
 						2, CommandActions.getDosAction(),
 						new FlagData("-l", "An integer which represents the byte size of each ICMP packet."),
