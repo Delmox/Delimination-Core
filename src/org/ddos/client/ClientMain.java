@@ -31,7 +31,7 @@ public class ClientMain {
 				System.out.print("Delimination>");
 				try {
 					commands.executeCommand(lastCommand = CommandInterface.parseCommand(in.nextLine()));
-				} catch (InvalidCommandArgumentsException | UnknownFlagException e) {
+				} catch (InvalidCommandArgumentsException e) {
 					System.out.println("Usage(s): ");
 					try {
 						for (CommandData data : commands.getCommandData(lastCommand.getBaseCommand())) {
@@ -47,6 +47,8 @@ public class ClientMain {
 							"Type \"help\" for a list of commands or \"help <command>\" for help with a specific command.");
 				} catch (CommandInterruptedException e) {
 					// who cares?
+				} catch (UnknownFlagException e) {
+					e.printStackTrace();
 				}
 			}
 		}
