@@ -75,10 +75,10 @@ public class ClientCommands {
 				new CommandData("kick <address...>",
 						"Kicks all given zombies from the server. The zombies will have to reconnect to the server.",
 						-1, CommandActions.getKickAction()));
-		commands.putCommand("list", new CommandData("list {-a all}",
-				"Gets the IP addresses of all zombies connected to the server.", 0,
-				CommandActions.getListZombiesAction(), new FlagData("-a",
-						"Gets the IP addresses of all computers connected to the server, including clients.")));
+		commands.putCommand("list",
+				new CommandData("list {-a all}", "Gets the IP addresses of all zombies connected to the server.", 0,
+						CommandActions.getListZombiesAction(), new FlagData("-a",
+								"Gets the IP addresses of all computers connected to the server, including clients.")));
 		commands.putCommand("refresh",
 				new CommandData("refresh", "Removes all of the disconected zombies off of the server.", 0,
 						CommandActions.getRemoveDeadZombiesAction()));
