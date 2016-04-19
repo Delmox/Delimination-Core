@@ -39,6 +39,9 @@ public class ClientMain {
 			e.printStackTrace();
 		}
 
+		System.out.println(
+				"Welcome to the Delimination client. For the newest updates, download the JAR at https://raw.githubusercontent.com/Delmox/Delimination-Core/master/jars/DeliminationCoreClient.jar.");
+
 		ClientCommands commands = new ClientCommands();
 
 		Command lastCommand = null;

