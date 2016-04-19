@@ -1,6 +1,9 @@
 package org.ddos.client;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.Scanner;
 
 import org.ddos.client.command.ClientCommands;
@@ -13,12 +16,25 @@ import org.jcom.CommandInterruptedException;
 import org.jcom.InvalidCommandArgumentsException;
 import org.jcom.UnknownCommandException;
 import org.jcom.UnknownFlagException;
+import org.jnetwork.CloseRequest;
 import org.jnetwork.Connection;
 
 public class ClientMain {
 	public static void main(String[] args) {
+		Socket socket = new Socket();
+		CloseRequest.addObjectToClose(socket);
+
 		try {
-			ClientNetwork.setClient(new Connection(ServerConstants.ADDRESS, ServerConstants.PORT));
+			socket.connect(new InetSocketAddress(ServerConstants.ADDRESS, ServerConstants.PORT), 1000);
+		} catch (SocketTimeoutException e2) {
+			System.err.println("The server is down, please launch the client when it is back up.");
+			return;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			ClientNetwork.setClient(new Connection(socket));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

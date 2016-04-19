@@ -52,6 +52,9 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 
 	@Override
 	public void clientDisconnected(SocketPackage event) {
+		if (readingClients.contains(event)) {
+			readingClients.remove(event);
+		}
 		try {
 			println(event.getConnection().getRemoteSocketAddress() + " disconnected.");
 		} catch (IOException e) {

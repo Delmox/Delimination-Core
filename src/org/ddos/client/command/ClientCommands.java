@@ -79,6 +79,8 @@ public class ClientCommands {
 				new CommandData("list {-a all}", "Gets the IP addresses of all zombies connected to the server.", 0,
 						CommandActions.getListZombiesAction(), new FlagData("-a",
 								"Gets the IP addresses of all computers connected to the server, including clients.")));
+		commands.putCommand("killserver", new CommandData("killserver", "Shuts down the server remotely.", 0,
+				CommandActions.getKillServerAction()));
 		commands.putCommand("refresh",
 				new CommandData("refresh", "Removes all of the disconected zombies off of the server.", 0,
 						CommandActions.getRemoveDeadZombiesAction()));

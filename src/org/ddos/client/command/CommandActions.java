@@ -372,4 +372,19 @@ public class CommandActions {
 			}
 		};
 	}
+
+	public static CommandJob getKillServerAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				try {
+					ClientNetwork.getClient().getOutputStream()
+							.writeObject(new DataPackage().setMessage("KILL_SERVER"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		};
+	}
 }

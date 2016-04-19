@@ -88,6 +88,15 @@ public class ClientCycle {
 
 				event.getOutputStream().writeObject(
 						new DataPackage(computers.toArray(new Computer[computers.size()])).setMessage("ALL_COMPUTERS"));
+			} else if(pkgIn.getMessage().equals("KILL_SERVER")) {
+				for (SocketPackage zombie : server.getClients()) {
+					if ((boolean) zombie.getExtraData()[0]) {
+						server.removeClient(zombie);
+					}
+				}
+				
+				System.out.println("Shutting down server by request.");
+				System.exit(0);
 			}
 		}
 	}
