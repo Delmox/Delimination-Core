@@ -4,8 +4,6 @@ import org.ddos.network.ClientNetwork;
 import org.jcom.Command;
 import org.jcom.CommandCompletionListener;
 import org.jcom.CommandData;
-import org.jcom.CommandException;
-import org.jcom.CommandExecutionListener;
 import org.jcom.CommandInterface;
 import org.jcom.CommandInterruptedException;
 import org.jcom.FlagData;
@@ -18,18 +16,6 @@ public class ClientCommands {
 	private CommandInterface commands = new CommandInterface();
 
 	public ClientCommands() {
-		commands.addCommandExecutionListener(new CommandExecutionListener() {
-			@Override
-			public void commandExecuted(Command c, CommandData d) {
-				if (!c.getBaseCommand().equals("refresh")) {
-					try {
-						commands.executeCommand("refresh");
-					} catch (CommandException e) {
-						// who gives a frick
-					}
-				}
-			}
-		});
 		commands.addCommandCompletionListener(new CommandCompletionListener() {
 			@Override
 			public void commandCompleted(Command c, CommandData d) {
