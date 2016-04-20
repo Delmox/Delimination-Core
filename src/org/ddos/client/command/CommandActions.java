@@ -21,6 +21,7 @@ import org.jcom.CommandException;
 import org.jcom.CommandInterruptedException;
 import org.jcom.CommandJob;
 import org.jcom.UnknownCommandException;
+import org.jnetwork.Connection;
 import org.jnetwork.DataPackage;
 
 public class CommandActions {
@@ -430,6 +431,57 @@ public class CommandActions {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				return null;
+			}
+		};
+	}
+
+	public static CommandJob getConnectAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				if (command.hasFlag("-v")) {
+					try {
+						if (!(boolean) command.getInterface()
+								.executeCommand("valid " + command.getCommandArguments()[0]))
+							return null;
+					} catch (CommandException e1) {
+						return null;
+					}
+				}
+				if (ClientNetwork.getClient() != null) {
+					try {
+						ClientNetwork.getClient().close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				try {
+					String[] split = command.getCommandArguments()[0].split(Pattern.quote(":"));
+					ClientNetwork.setClient(new Connection(split[0], Integer.parseInt(split[1])));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				System.out.println("Set server to " + command.getCommandArguments()[0]);
+
+				return null;
+			}
+		};
+	}
+
+	public static CommandJob getDisconnectAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				try {
+					ClientNetwork.getClient().close();
+					ClientNetwork.setClient(null);
+				} catch (Exception e) {
+					return null;
+				}
+
+				System.out.println("Disconnected from server.");
+
 				return null;
 			}
 		};

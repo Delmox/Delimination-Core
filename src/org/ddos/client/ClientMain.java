@@ -1,14 +1,10 @@
 package org.ddos.client;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
+import java.util.regex.Pattern;
 
 import org.ddos.client.command.ClientCommands;
 import org.ddos.network.ClientNetwork;
 import org.ddos.util.Console;
-import org.ddos.util.ServerConstants;
 import org.jcom.Command;
 import org.jcom.CommandData;
 import org.jcom.CommandInterface;
@@ -16,38 +12,36 @@ import org.jcom.CommandInterruptedException;
 import org.jcom.InvalidCommandArgumentsException;
 import org.jcom.UnknownCommandException;
 import org.jcom.UnknownFlagException;
-import org.jnetwork.CloseRequest;
 import org.jnetwork.Connection;
 
 public class ClientMain {
 	public static void main(String[] args) {
-		Socket socket = new Socket();
-		CloseRequest.addObjectToClose(socket);
-
-		try {
-			socket.connect(new InetSocketAddress(ServerConstants.ADDRESS, ServerConstants.PORT), 1000);
-		} catch (SocketTimeoutException e2) {
-			System.err.println("The server is down, please launch the client when it is back up.");
-			return;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			ClientNetwork.setClient(new Connection(socket));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 		System.out.println("Welcome to the Delimination client.");
 
 		ClientCommands commands = new ClientCommands();
 
 		Command lastCommand = null;
 		while (true) {
-			System.out.print("Delimination>");
 			try {
-				commands.executeCommand(lastCommand = CommandInterface.parseCommand(Console.input.nextLine()));
+				System.out.print("Please connect to the server: ");
+				String[] split = Console.input.nextLine().split(Pattern.quote(":"));
+				ClientNetwork.setClient(new Connection(split[0], Integer.parseInt(split[1])));
+				break;
+			} catch (Exception e) {
+				System.out.println("Invalid address.");
+				continue;
+			}
+		}
+		System.out.println();
+
+		while (true) {
+			System.out.print("Delimination>");
+			String raw = Console.input.nextLine().trim();
+			if (raw.isEmpty())
+				continue;
+
+			try {
+				commands.executeCommand(lastCommand = CommandInterface.parseCommand(raw));
 			} catch (InvalidCommandArgumentsException e) {
 				System.out.println("Usage(s): ");
 				try {
