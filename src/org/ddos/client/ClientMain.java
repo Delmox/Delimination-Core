@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.Scanner;
 
 import org.ddos.client.command.ClientCommands;
 import org.ddos.network.ClientNetwork;
+import org.ddos.util.Console;
 import org.ddos.util.ServerConstants;
 import org.jcom.Command;
 import org.jcom.CommandData;
@@ -39,36 +39,33 @@ public class ClientMain {
 			e.printStackTrace();
 		}
 
-		System.out.println(
-				"Welcome to the Delimination client. For the newest updates, download the JAR at https://raw.githubusercontent.com/Delmox/Delimination-Core/master/jars/DeliminationCoreClient.jar.");
+		System.out.println("Welcome to the Delimination client.");
 
 		ClientCommands commands = new ClientCommands();
 
 		Command lastCommand = null;
-		try (Scanner in = new Scanner(System.in)) {
-			while (true) {
-				System.out.print("Delimination>");
+		while (true) {
+			System.out.print("Delimination>");
+			try {
+				commands.executeCommand(lastCommand = CommandInterface.parseCommand(Console.input.nextLine()));
+			} catch (InvalidCommandArgumentsException e) {
+				System.out.println("Usage(s): ");
 				try {
-					commands.executeCommand(lastCommand = CommandInterface.parseCommand(in.nextLine()));
-				} catch (InvalidCommandArgumentsException e) {
-					System.out.println("Usage(s): ");
-					try {
-						for (CommandData data : commands.getCommandData(lastCommand.getBaseCommand())) {
-							System.out.println("\t" + data.getUsage());
-						}
-					} catch (UnknownCommandException e1) {
-						// never happens
+					for (CommandData data : commands.getCommandData(lastCommand.getBaseCommand())) {
+						System.out.println("\t" + data.getUsage());
 					}
-					System.out.println("Type \"help " + lastCommand.getBaseCommand() + "\" for help with the command.");
-				} catch (UnknownCommandException e) {
-					System.out.println("Unknown command: " + lastCommand.getBaseCommand());
-					System.out.println(
-							"Type \"help\" for a list of commands or \"help <command>\" for help with a specific command.");
-				} catch (CommandInterruptedException e) {
-					// who cares?
-				} catch (UnknownFlagException e) {
-					e.printStackTrace();
+				} catch (UnknownCommandException e1) {
+					// never happens
 				}
+				System.out.println("Type \"help " + lastCommand.getBaseCommand() + "\" for help with the command.");
+			} catch (UnknownCommandException e) {
+				System.out.println("Unknown command: " + lastCommand.getBaseCommand());
+				System.out.println(
+						"Type \"help\" for a list of commands or \"help <command>\" for help with a specific command.");
+			} catch (CommandInterruptedException e) {
+				// who cares?
+			} catch (UnknownFlagException e) {
+				e.printStackTrace();
 			}
 		}
 	}
