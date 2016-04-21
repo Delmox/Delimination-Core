@@ -17,7 +17,9 @@ public class Updater {
 
 			Thread.sleep(1000);
 
-			target.delete();
+			if (target.exists())
+				target.delete();
+
 			target.createNewFile();
 
 			FileUtils.copyURLToFile(
