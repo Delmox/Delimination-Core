@@ -38,12 +38,13 @@ public class ClientMain {
 
 				if (!(boolean) ClientNetwork.getClient().getInputStream().readObject()) {
 					System.out.println("Invalid password.");
-					continue;
+					System.exit(1);
 				} else {
 					break;
 				}
 			} catch (Exception e2) {
-				System.out.println("An exception error occurred: " + e2.getMessage());
+				System.out.println(
+						"An exception occurred: " + e2.getMessage() + " (" + e2.getClass().getSimpleName() + ")");
 				return;
 			}
 		}

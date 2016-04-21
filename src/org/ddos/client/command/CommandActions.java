@@ -445,15 +445,6 @@ public class CommandActions {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command command) {
-				if (command.hasFlag("-v")) {
-					try {
-						if (!(boolean) command.getInterface()
-								.executeCommand("valid " + command.getCommandArguments()[0]))
-							return null;
-					} catch (CommandException e1) {
-						return null;
-					}
-				}
 				if (ClientNetwork.getClient() != null) {
 					try {
 						ClientNetwork.getClient().close();
@@ -467,14 +458,13 @@ public class CommandActions {
 					return null;
 				}
 				try {
-					String[] split = command.getCommandArguments()[0].split(Pattern.quote(":"));
-					ClientNetwork.setClient(new Connection(split[0], Integer.parseInt(split[1])));
+					ClientNetwork.setClient(new Connection("server2.jacobsrandomsite.com", 25565));
 				} catch (SocketException e) {
 					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				System.out.println("Set server to " + command.getCommandArguments()[0]);
+				System.out.println("Connected back to the server.");
 
 				return null;
 			}
