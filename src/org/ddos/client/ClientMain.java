@@ -1,10 +1,11 @@
 package org.ddos.client;
 
-import java.util.regex.Pattern;
+import java.io.IOException;
 
 import org.ddos.client.command.ClientCommands;
 import org.ddos.network.ClientNetwork;
 import org.ddos.util.Console;
+import org.ddos.util.ServerConstants;
 import org.jcom.Command;
 import org.jcom.CommandData;
 import org.jcom.CommandInterface;
@@ -13,6 +14,7 @@ import org.jcom.InvalidCommandArgumentsException;
 import org.jcom.UnknownCommandException;
 import org.jcom.UnknownFlagException;
 import org.jnetwork.Connection;
+import org.jnetwork.DataPackage;
 
 public class ClientMain {
 	public static void main(String[] args) {
@@ -20,20 +22,33 @@ public class ClientMain {
 
 		ClientCommands commands = new ClientCommands();
 
-		Command lastCommand = null;
+		try {
+			ClientNetwork.setClient(new Connection(ServerConstants.ADDRESS, ServerConstants.PORT));
+		} catch (IOException e2) {
+			System.out.println("The server is down. Plese try again later.");
+			return;
+		}
+
 		while (true) {
+			System.out.print("Enter the admin password: ");
+			String password = Console.input.nextLine();
 			try {
-				System.out.print("Please connect to the server: ");
-				String[] split = Console.input.nextLine().split(Pattern.quote(":"));
-				ClientNetwork.setClient(new Connection(split[0], Integer.parseInt(split[1])));
-				break;
-			} catch (Exception e) {
-				System.out.println("Invalid address.");
-				continue;
+				ClientNetwork.getClient().getOutputStream()
+						.writeObject(new DataPackage(false, password).setMessage("INITIAL_PACKAGE"));
+
+				if (!(boolean) ClientNetwork.getClient().getInputStream().readObject()) {
+					System.out.println("Invalid password.");
+					continue;
+				} else {
+					break;
+				}
+			} catch (Exception e2) {
+				System.out.println("An exception error occurred: " + e2.getMessage());
+				return;
 			}
 		}
-		System.out.println();
 
+		Command lastCommand = null;
 		while (true) {
 			System.out.print("Delimination>");
 			String raw = Console.input.nextLine().trim();

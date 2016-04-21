@@ -462,6 +462,9 @@ public class CommandActions {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+				} else {
+					System.out.println("Already connected; please disconnect first.");
+					return null;
 				}
 				try {
 					String[] split = command.getCommandArguments()[0].split(Pattern.quote(":"));
@@ -482,12 +485,17 @@ public class CommandActions {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command command) {
-				try {
-					ClientNetwork.getClient().close();
-					ClientNetwork.setClient(null);
-				} catch (SocketException e) {
-					Exceptions.unconnectedException();
-				} catch (Exception e) {
+				if (ClientNetwork.getClient() != null) {
+					try {
+						ClientNetwork.getClient().close();
+						ClientNetwork.setClient(null);
+					} catch (SocketException e) {
+						Exceptions.unconnectedException();
+					} catch (Exception e) {
+						return null;
+					}
+				} else {
+					System.out.println("Cannot disconnect; not connected in the first place.");
 					return null;
 				}
 
