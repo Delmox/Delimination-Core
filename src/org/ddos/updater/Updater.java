@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
+import org.jnetwork.Connection;
+import org.jnetwork.DataPackage;
 
 public class Updater {
 	public static final String NAME = "DeliminationCoreUpdater";
 
 	public static void main(String[] args) {
-		File target = new File(System.getProperty("user.dir") + "\\DeliminationCore" + args[0] + ".jar");
+		File target = new File(System.getProperty("user.dir") + File.separator + "DeliminationCore" + args[0] + ".jar");
 
 		try {
 			System.out.println("Updating...");
@@ -22,12 +24,16 @@ public class Updater {
 
 			target.createNewFile();
 
-			FileUtils.copyURLToFile(
-					new URL("https://raw.githubusercontent.com/Delmox/Delimination-Core/master/jars/DeliminationCore"
-							+ args[0] + ".jar"),
-					target);
-
+			Connection client = new Connection("server2.jacobsrandomsite.com", 25565);
+			client.getOutputStream()
+					.writeObject(args.length > 1 ? new DataPackage(args[1]).setMessage("CLIENT_JAR_REQUEST")
+							: new DataPackage().setMessage("ZOMBIE_JAR_REQUEST"));
+			client.getInputStream().readFile(target);
+			client.close();
 			System.out.println("Updated!");
+		} catch (ClassCastException e) {
+			// a FileData object was not returned, so invalid client request
+			System.err.println("Invalid client code!");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
