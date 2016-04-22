@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import org.ddos.server.cycle.ClientCycle;
 import org.ddos.server.cycle.ZombieCycle;
+import org.ddos.util.Status;
 import org.jnetwork.DataPackage;
 import org.jnetwork.Server;
 import org.jnetwork.SocketPackage;
@@ -36,6 +37,7 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 	}
 
 	private Server server;
+	private Status status = new Status();
 	public ArrayList<SocketPackage> readingClients = new ArrayList<>();
 
 	public Server getServer() {
@@ -121,5 +123,13 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 		for (SocketPackage client : readingClients) {
 			client.getOutputStream().writeObject(new DataPackage(o).setMessage("CONSOLE_OUTPUT"));
 		}
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 }

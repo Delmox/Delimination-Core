@@ -43,6 +43,8 @@ public class ClientCommands {
 				CommandActions.getDisconnectAction()));
 		commands.putCommand("connect", new CommandData("connect", "Connects back to the Delimination server.", 0,
 				CommandActions.getConnectAction()));
+		commands.putCommand("status", new CommandData("status", "Gets the status of all DDoSes in progress.", 0,
+				CommandActions.getStatusAction()));
 		commands.putCommand("rz",
 				new CommandData("rz <address>",
 						"Continuously reads the output from a zombie computer until the command is exited.", 1,
