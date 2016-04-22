@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+import org.ddos.server.cycle.ClientCycle;
+import org.ddos.server.cycle.ZombieCycle;
 import org.jnetwork.DataPackage;
 import org.jnetwork.Server;
 import org.jnetwork.SocketPackage;

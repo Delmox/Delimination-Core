@@ -1,9 +1,10 @@
-package org.ddos.server;
+package org.ddos.server.cycle;
 
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 
+import org.ddos.server.DDOSServer;
 import org.ddos.updater.Updater;
 import org.ddos.util.Computer;
 import org.jnetwork.DataPackage;

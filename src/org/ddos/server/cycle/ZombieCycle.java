@@ -1,8 +1,9 @@
-package org.ddos.server;
+package org.ddos.server.cycle;
 
 import java.io.IOException;
 import java.net.SocketAddress;
 
+import org.ddos.server.DDOSServer;
 import org.jnetwork.DataPackage;
 import org.jnetwork.Server;
 import org.jnetwork.SocketPackage;
