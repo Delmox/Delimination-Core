@@ -146,7 +146,7 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 	}
 
 	public Computer[] getBanlist() {
-		return (Computer[]) banList.toArray();
+		return banList.toArray(new Computer[banList.size()]);
 	}
 
 	public void setBanlist(Computer... banList) {
