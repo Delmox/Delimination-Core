@@ -8,7 +8,6 @@ import org.ddos.util.Console;
 import org.ddos.util.ServerConstants;
 import org.jcom.Command;
 import org.jcom.CommandData;
-import org.jcom.CommandInterface;
 import org.jcom.CommandInterruptedException;
 import org.jcom.InvalidCommandArgumentsException;
 import org.jcom.UnknownCommandException;
@@ -57,7 +56,7 @@ public class ClientMain {
 				continue;
 
 			try {
-				commands.executeCommand(lastCommand = CommandInterface.parseCommand(raw));
+				commands.executeCommand(lastCommand = commands.parseCommand(raw));
 			} catch (InvalidCommandArgumentsException e) {
 				System.out.println("Usage(s): ");
 				try {

