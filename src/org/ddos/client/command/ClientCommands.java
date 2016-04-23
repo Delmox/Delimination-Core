@@ -39,6 +39,8 @@ public class ClientCommands {
 						new FlagData("-l", "An integer which represents the byte size of each ICMP packet."),
 						new FlagData("-t", "An integer which represents the amount of threads which will be pinging."),
 						new FlagData("-v", "Checks if the address is valid before the DDoS starts.")));
+		commands.putCommand("banlist", new CommandData("banlist [add|remove] <address>",
+				"Adds or removes an IP address from the banlist.", 2, CommandActions.getBanlistAction()));
 		commands.putCommand("disconnect", new CommandData("disconnect", "Disconnects from the Delimination server.", 0,
 				CommandActions.getDisconnectAction()));
 		commands.putCommand("connect", new CommandData("connect", "Connects back to the Delimination server.", 0,
