@@ -57,6 +57,7 @@ public class ClientCommands {
 				new CommandData("banlist", "Lists all the banned computers.", 0, CommandActions.getBanlistAction()),
 				new CommandData("banlist [add|remove] <address>", "Adds or removes an IP address from the banlist.", 2,
 						CommandActions.getBanlistAction()));
+		commands.putCommand("echo", new CommandData("echo <data...>", "Echos out the given data to the console.", -1, CommandActions.getEchoActions()));
 		commands.putCommand("disconnect", new CommandData("disconnect", "Disconnects from the Delimination server.", 0,
 				CommandActions.getDisconnectAction()));
 		commands.putCommand("connect", new CommandData("connect", "Connects back to the Delimination server.", 0,

@@ -605,4 +605,16 @@ public class CommandActions {
 			}
 		};
 	}
+
+	public static CommandJob getEchoActions() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				for (String arg : command.getCommandArguments()) {
+					System.out.println(arg);
+				}
+				return null;
+			}
+		};
+	}
 }
