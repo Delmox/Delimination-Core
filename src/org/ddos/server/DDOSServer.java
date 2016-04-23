@@ -54,6 +54,8 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 		try (FileInputStream fin = new FileInputStream(BANLIST_FILE)) {
 			try (ObjectInputStream oin = new ObjectInputStream(fin)) {
 				banList = new ArrayList<>(Arrays.asList((Computer[]) oin.readObject()));
+			} catch (EOFException e) {
+				serializeBanlist();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

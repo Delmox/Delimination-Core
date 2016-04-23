@@ -565,15 +565,17 @@ public class CommandActions {
 			public Object doJob(Command command) {
 				try {
 					if (command.hasCommandArguments()) {
-						String ip = command.getCommandArguments()[1].trim();
+						String ip = command.getCommandArguments()[1].split(Pattern.quote(":"))[0].trim();
+						int port = Integer
+								.parseInt(command.getCommandArguments()[1].split(Pattern.quote(":"))[1].trim());
 
 						if (command.getCommandArguments()[0].equals("add")) {
-							ClientNetwork.getClient().getOutputStream()
-									.writeObject(new DataPackage(ip).setMessage("BAN_COMPUTER"));
+							ClientNetwork.getClient().getOutputStream().writeObject(
+									new DataPackage(new InetSocketAddress(ip, port)).setMessage("BAN_COMPUTER"));
 							System.out.println("Added " + ip + " from the banlist.");
 						} else if (command.getCommandArguments()[0].equals("remove")) {
-							ClientNetwork.getClient().getOutputStream()
-									.writeObject(new DataPackage(ip).setMessage("UNBAN_COMPTUER"));
+							ClientNetwork.getClient().getOutputStream().writeObject(
+									new DataPackage(new InetSocketAddress(ip, port)).setMessage("UNBAN_COMPTUER"));
 							System.out.println("Removed " + ip + " from the banlist.");
 						} else {
 							System.out.println("Unknown banlist action: " + command.getCommandArguments()[0]);
