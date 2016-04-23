@@ -585,6 +585,10 @@ public class CommandActions {
 						Computer[] computers = (Computer[]) ((DataPackage) ClientNetwork.getClient().getInputStream()
 								.readObject()).getObjects();
 						System.out.println("Banned computers:");
+						if (computers.length == 0) {
+							System.out.println("\tNone");
+							return null;
+						}
 						for (Computer computer : computers) {
 							System.out.println(computer.getAddress().toString().split(Pattern.quote(":"))[0] + " ("
 									+ (computer.isZombie() ? "zombie" : "client") + ")");
