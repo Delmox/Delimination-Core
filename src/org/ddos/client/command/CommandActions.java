@@ -400,7 +400,7 @@ public class CommandActions {
 					e.printStackTrace();
 					return null;
 				}
-				System.out.println("Successfully the server.");
+				System.out.println("Successfully killed the server.");
 				return null;
 			}
 		};
