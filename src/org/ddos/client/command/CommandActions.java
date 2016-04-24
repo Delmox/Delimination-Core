@@ -28,6 +28,7 @@ import org.jcom.CommandJob;
 import org.jcom.UnknownCommandException;
 import org.jnetwork.Connection;
 import org.jnetwork.DataPackage;
+import org.jnetwork.SocketType;
 
 public class CommandActions {
 	public static CommandJob getDdosAction() {
@@ -465,7 +466,7 @@ public class CommandActions {
 					return null;
 				}
 				try {
-					ClientNetwork.setClient(new Connection("server2.jacobsrandomsite.com", 25565));
+					ClientNetwork.setClient(new Connection(SocketType.DEFAULT, "server2.jacobsrandomsite.com", 25565));
 
 					while (true) {
 						System.out.print("Enter the admin password: ");

@@ -25,7 +25,7 @@ public class Updater {
 
 			target.createNewFile();
 
-			Connection client = new Connection(SocketType.DEFALT, "server2.jacobsrandomsite.com", 25565);
+			Connection client = new Connection(SocketType.DEFAULT, "server2.jacobsrandomsite.com", 25565);
 			client.getOutputStream()
 					.writeObject(args.length > 1 ? new DataPackage(args[1]).setMessage("CLIENT_JAR_REQUEST")
 							: new DataPackage().setMessage("ZOMBIE_JAR_REQUEST"));

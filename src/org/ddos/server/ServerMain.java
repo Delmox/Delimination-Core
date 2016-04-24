@@ -11,7 +11,7 @@ public class ServerMain {
 
 		System.out.println("Started server on port 25565.");
 		try {
-			server.setServer(new Server(SocketType.DEFALT, 25565, server));
+			server.setServer(new Server(SocketType.DEFAULT, 25565, server));
 			server.getServer().addClientDisconnectionListener(server);
 			server.getServer().start();
 		} catch (IOException e) {

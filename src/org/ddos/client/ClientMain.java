@@ -22,7 +22,7 @@ public class ClientMain {
 
 		ClientCommands commands = new ClientCommands();
 		try {
-			ClientNetwork.setClient(new Connection(SocketType.DEFALT, ServerConstants.ADDRESS, ServerConstants.PORT));
+			ClientNetwork.setClient(new Connection(SocketType.DEFAULT, ServerConstants.ADDRESS, ServerConstants.PORT));
 		} catch (IOException e2) {
 			System.out.println("The server is down. Plese try again later.");
 			return;
