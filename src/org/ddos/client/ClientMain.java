@@ -20,7 +20,6 @@ public class ClientMain {
 		System.out.println("Welcome to the Delimination client.");
 
 		ClientCommands commands = new ClientCommands();
-
 		try {
 			ClientNetwork.setClient(new Connection(ServerConstants.ADDRESS, ServerConstants.PORT));
 		} catch (IOException e2) {
