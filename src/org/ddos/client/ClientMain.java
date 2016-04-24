@@ -14,6 +14,7 @@ import org.jcom.UnknownCommandException;
 import org.jcom.UnknownFlagException;
 import org.jnetwork.Connection;
 import org.jnetwork.DataPackage;
+import org.jnetwork.SocketType;
 
 public class ClientMain {
 	public static void main(String[] args) {
@@ -21,7 +22,7 @@ public class ClientMain {
 
 		ClientCommands commands = new ClientCommands();
 		try {
-			ClientNetwork.setClient(new Connection(ServerConstants.ADDRESS, ServerConstants.PORT));
+			ClientNetwork.setClient(new Connection(SocketType.DEFALT, ServerConstants.ADDRESS, ServerConstants.PORT));
 		} catch (IOException e2) {
 			System.out.println("The server is down. Plese try again later.");
 			return;

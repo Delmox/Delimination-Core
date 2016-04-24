@@ -3,6 +3,7 @@ package org.ddos.server;
 import java.io.IOException;
 
 import org.jnetwork.Server;
+import org.jnetwork.SocketType;
 
 public class ServerMain {
 	public static void main(String[] args) {
@@ -10,7 +11,7 @@ public class ServerMain {
 
 		System.out.println("Started server on port 25565.");
 		try {
-			server.setServer(new Server(25565, server));
+			server.setServer(new Server(SocketType.DEFALT, 25565, server));
 			server.getServer().addClientDisconnectionListener(server);
 			server.getServer().start();
 		} catch (IOException e) {

@@ -7,6 +7,7 @@ import java.net.URL;
 import org.apache.commons.io.FileUtils;
 import org.jnetwork.Connection;
 import org.jnetwork.DataPackage;
+import org.jnetwork.SocketType;
 
 public class Updater {
 	public static final String NAME = "DeliminationCoreUpdater";
@@ -24,7 +25,7 @@ public class Updater {
 
 			target.createNewFile();
 
-			Connection client = new Connection("server2.jacobsrandomsite.com", 25565);
+			Connection client = new Connection(SocketType.DEFALT, "server2.jacobsrandomsite.com", 25565);
 			client.getOutputStream()
 					.writeObject(args.length > 1 ? new DataPackage(args[1]).setMessage("CLIENT_JAR_REQUEST")
 							: new DataPackage().setMessage("ZOMBIE_JAR_REQUEST"));
